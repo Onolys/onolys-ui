@@ -35,20 +35,41 @@ describe("generated token CSS", () => {
     expect(css).toBe(renderTokensCss());
     expect(css).toMatch(/^\/\* Generated/);
     expect(css).toContain("@media (prefers-color-scheme: dark) {");
+    expect(css).toContain(':root:not([data-theme="light"]) {');
+    expect(css).toContain(':root[data-theme="dark"] {');
     expect(css).not.toContain(".dark");
   });
 
   it("declares every token exactly once in each theme with the source value", () => {
     const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
-    const blocks = [...css.matchAll(/:root\s*\{([^}]+)\}/g)];
-    expect(blocks).toHaveLength(2);
-    themes.forEach((theme, index) => {
+    const blocks = [...css.matchAll(/:root[^{]*\{([^}]+)\}/g)];
+    expect(blocks).toHaveLength(3);
+    [...themes, "dark" as Theme].forEach((theme, index) => {
       const declarations = [...blocks[index][1].matchAll(/--([\w-]+):\s*([^;]+);/g)]
         .map(([, name, value]) => [name, value]);
       expect(declarations).toHaveLength(Object.keys(tokens[theme]).length);
       expect(Object.fromEntries(declarations)).toEqual(tokens[theme]);
     });
     expect(Object.keys(tokens.light)).toEqual(Object.keys(tokens.dark));
+  });
+
+  it("supports a manual data-theme override with identical dark values", () => {
+    const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
+    const media = css.match(/@media \(prefers-color-scheme: dark\) \{\s*:root:not\(\[data-theme="light"\]\) \{([^}]+)\}/);
+    const forced = css.match(/\n:root\[data-theme="dark"\] \{([^}]+)\}/);
+    expect(media).not.toBeNull();
+    expect(forced).not.toBeNull();
+    const norm = (body: string) => [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, n, v]) => `${n}:${v}`);
+    expect(norm(media![1])).toEqual(norm(forced![1]));
+    expect(norm(forced![1]).length).toBeGreaterThan(0);
+    expect(css).not.toContain(':root[data-theme="light"] {');
+  });
+
+  it("sets color-scheme per data-theme and keeps light dark by default", () => {
+    const base = readFileSync(new URL("../styles/base.css", import.meta.url), "utf8");
+    expect(base).toContain("color-scheme: light dark;");
+    expect(base).toMatch(/:root\[data-theme="light"\]\s*\{\s*color-scheme: light;/);
+    expect(base).toMatch(/:root\[data-theme="dark"\]\s*\{\s*color-scheme: dark;/);
   });
 
   it("preserves the light brand and score palette", () => {
@@ -81,6 +102,43 @@ describe("WCAG AA token contrast", () => {
       expect(violations(bad)).toContain("foreground on background: 1.000 < 4.5 (text)");
     });
   }
+
+  const statusNames = ["success", "warning", "destructive"] as const;
+  function hue(hex: string): number {
+    const [r, g, b] = hex.slice(1).match(/../g)!.map((c) => Number.parseInt(c, 16) / 255);
+    const max = Math.max(r, g, b), d = max - Math.min(r, g, b);
+    const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return (h * 60 + 360) % 360;
+  }
+
+  for (const theme of themes) {
+    it(`${theme}: success, warning and destructive text reach 4.5:1 on card and background`, () => {
+      for (const name of statusNames) {
+        for (const surface of ["card", "background"] as const) {
+          const ratio = contrast(tokens[theme][name], tokens[theme][surface]);
+          expect(ratio, `${name} on ${surface}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    it(`${theme}: success is green, warning is amber, all three are distinct`, () => {
+      const t = tokens[theme];
+      expect(hue(t.success)).toBeGreaterThanOrEqual(90);
+      expect(hue(t.success)).toBeLessThanOrEqual(170);
+      expect(hue(t.warning)).toBeGreaterThanOrEqual(30);
+      expect(hue(t.warning)).toBeLessThanOrEqual(60);
+      expect(new Set([t.success, t.warning, t.destructive]).size).toBe(3);
+    });
+  }
+
+  it("exposes status colors as Tailwind theme colors and in all generated blocks", () => {
+    const theme = readFileSync(new URL("../styles/theme.css", import.meta.url), "utf8");
+    for (const name of statusNames) expect(theme).toContain(`--color-${name}: var(--${name});`);
+    const css = renderTokensCss();
+    for (const name of ["success", "warning"]) {
+      expect(css.match(new RegExp(`--${name}:`, "g"))).toHaveLength(3);
+    }
+  });
 
   it("rejects a deliberately invisible UI boundary at the 3:1 threshold", () => {
     expect(violations({ ...tokens.light, border: tokens.light.background }))

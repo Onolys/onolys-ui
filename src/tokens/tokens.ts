@@ -42,6 +42,8 @@ const light = {
   "accent-foreground": "#171c1c",
   destructive: "#8a3030",
   "destructive-foreground": "#ffffff",
+  success: "#166534",
+  warning: "#854d0e",
   // Stronger than legacy gray-300: these boundaries convey control affordances.
   border: "#6e7e7c",
   input: "#6e7e7c",
@@ -103,6 +105,8 @@ const dark = {
   "accent-foreground": "#e6efed",
   destructive: "#f29b9b",
   "destructive-foreground": "#241111",
+  success: "#6ee79a",
+  warning: "#fbbf24",
   border: "#78928d",
   input: "#78928d",
   ring: "#5fc4b8",
@@ -175,6 +179,10 @@ export const contrastPairs: readonly ContrastPair[] = [
     ["score-low", "score-low-bg"],
     ["destructive", "background"],
     ["destructive", "card"],
+    ["success", "background"],
+    ["success", "card"],
+    ["warning", "background"],
+    ["warning", "card"],
   ] as const).map(([foreground, background]) => ({ foreground, background, usage: "text" as const })),
   ...evidenceColors.flatMap((foreground) => contentSurfaces.map((background) =>
     ({ foreground, background, usage: "text" as const }))),
@@ -193,5 +201,6 @@ export function renderTokensCss(): string {
     .join("\n");
   return "/* Generated from tokens.ts by npm run tokens:generate. Do not edit. */\n"
     + `:root {\n${declarations("light", "  ")}\n}\n\n`
-    + `@media (prefers-color-scheme: dark) {\n  :root {\n${declarations("dark", "    ")}\n  }\n}\n`;
+    + `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${declarations("dark", "    ")}\n  }\n}\n\n`
+    + `:root[data-theme="dark"] {\n${declarations("dark", "  ")}\n}\n`;
 }
