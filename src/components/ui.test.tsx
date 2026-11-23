@@ -39,10 +39,6 @@ import {
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Separator,
   Skeleton,
   Table,
@@ -63,16 +59,8 @@ import {
   TooltipTrigger,
 } from "../index";
 
-// jsdom has no layout APIs; Radix calls these while opening positioned content.
-const originalScrollIntoView = Object.getOwnPropertyDescriptor(
-  Element.prototype,
-  "scrollIntoView",
-);
+// Tooltip positioning observes its trigger; jsdom has no ResizeObserver.
 beforeAll(() => {
-  Object.defineProperty(Element.prototype, "scrollIntoView", {
-    configurable: true,
-    value: vi.fn(),
-  });
   vi.stubGlobal(
     "ResizeObserver",
     class {
@@ -82,16 +70,7 @@ beforeAll(() => {
     },
   );
 });
-afterAll(() => {
-  if (originalScrollIntoView)
-    Object.defineProperty(
-      Element.prototype,
-      "scrollIntoView",
-      originalScrollIntoView,
-    );
-  else Reflect.deleteProperty(Element.prototype, "scrollIntoView");
-  vi.unstubAllGlobals();
-});
+afterAll(() => vi.unstubAllGlobals());
 
 const user = () => userEvent.setup();
 
@@ -254,40 +233,31 @@ describe("Checkbox", () => {
 });
 
 describe("Select", () => {
-  it("chooses a named option with the keyboard", async () => {
+  it("selects a named native option", async () => {
     const change = vi.fn();
     render(
-      <Select onValueChange={change}>
-        <SelectTrigger aria-label="Language">
-          <SelectValue placeholder="Choose language" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="en">English</SelectItem>
-          <SelectItem value="fr">French</SelectItem>
-        </SelectContent>
+      <Select
+        aria-label="Language"
+        onChange={(event) => change(event.currentTarget.value)}
+      >
+        <option value="en">English</option>
+        <option value="fr">French</option>
       </Select>,
     );
-    const trigger = screen.getByRole("combobox", { name: "Language" });
-    expect(trigger).toHaveClass("min-h-11");
-    await user().tab();
-    await user().keyboard("{Enter}");
-    const option = await screen.findByRole("option", { name: "English" });
-    expect(option).toHaveClass("min-h-11");
-    await user().keyboard("{End}{Enter}");
+    const select = screen.getByRole("combobox", { name: "Language" });
+    expect(select).toHaveClass("min-h-11");
+    await user().selectOptions(select, "fr");
     expect(change).toHaveBeenCalledWith("fr");
-    expect(trigger).toHaveTextContent("French");
+    expect(select).toHaveValue("fr");
   });
 
-  it("keeps a small trigger accessible and disabled", () => {
+  it("preserves disabled semantics", () => {
     render(
-      <Select disabled>
-        <SelectTrigger size="sm" aria-label="Language">
-          <SelectValue />
-        </SelectTrigger>
+      <Select disabled aria-label="Language">
+        <option value="en">English</option>
       </Select>,
     );
     expect(screen.getByRole("combobox", { name: "Language" })).toBeDisabled();
-    expect(screen.getByRole("combobox")).toHaveClass("min-h-11");
   });
 });
 

@@ -86,13 +86,38 @@ The named package exports include Button, Input, Label, Textarea, Select, Checkb
 Tabs, Card, Badge, Alert, Table, Dialog, AlertDialog, DropdownMenu, Separator,
 Skeleton, Tooltip, and their composition helpers. Interactive defaults have at
 least a 44px target; all button size names keep that minimum, including icon sizes.
-Components retain Radix keyboard behavior and accept caller labels and React refs.
+Radix primitives retain their keyboard behavior and accept caller labels and React
+refs. Select uses native browser keyboard and form behavior.
 Use DialogTitle/DialogDescription and AlertDialogTitle/AlertDialogDescription to
 name and describe overlays, and wrap tooltips in TooltipProvider.
 
 The primitives come from the new-york registry through shadcn CLI 4.23.0, with
 Onolys semantic colors, automatic dark mode, and opaque 3px focus rings. The
 upstream MIT notice is included in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Dialogs and alert dialogs retain Radix modal content, focus trapping, dismissal
+callbacks, and confirmation/cancel behavior. Their backdrops use bundled CSS, with
+counted `body[data-scroll-locked]` locks that restore previous state after the last
+modal closes. DropdownMenu is always non-modal and does not accept a `modal` prop.
+These choices support an enforced `style-src 'self'` policy without injected styles.
+
+Select is a styled native `<select>` because Radix Select injects runtime stylesheets
+that Chromium blocks under that policy. Use native `<option>` and `<optgroup>`
+children, native `onChange`, and normal React select props (`value`, `defaultValue`,
+`name`, `required`, `disabled`, `multiple`, and numeric `size`). Radix composition
+helpers such as SelectTrigger, SelectContent, and SelectItem are not exported.
+
+```tsx
+<Select name="language" aria-label="Language" defaultValue="en">
+  <option value="en">English</option>
+  <option value="fr">French</option>
+</Select>
+```
+
+The focused `overlay-csp.test.ts` regression builds the package and verifies these
+controls in Chromium under `style-src 'self'`. A raw Radix Select case deliberately
+reproduces the blocked inline stylesheets, keeping the reason for the fallback
+testable. Dialog/AlertDialog/Menu checks run in both automatic color themes.
 
 Run shadcn inside this repository when reviewing upstream component changes:
 
