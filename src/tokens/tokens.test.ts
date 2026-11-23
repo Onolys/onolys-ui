@@ -103,6 +103,43 @@ describe("WCAG AA token contrast", () => {
     });
   }
 
+  const statusNames = ["success", "warning", "destructive"] as const;
+  function hue(hex: string): number {
+    const [r, g, b] = hex.slice(1).match(/../g)!.map((c) => Number.parseInt(c, 16) / 255);
+    const max = Math.max(r, g, b), d = max - Math.min(r, g, b);
+    const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return (h * 60 + 360) % 360;
+  }
+
+  for (const theme of themes) {
+    it(`${theme}: success, warning and destructive text reach 4.5:1 on card and background`, () => {
+      for (const name of statusNames) {
+        for (const surface of ["card", "background"] as const) {
+          const ratio = contrast(tokens[theme][name], tokens[theme][surface]);
+          expect(ratio, `${name} on ${surface}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    it(`${theme}: success is green, warning is amber, all three are distinct`, () => {
+      const t = tokens[theme];
+      expect(hue(t.success)).toBeGreaterThanOrEqual(90);
+      expect(hue(t.success)).toBeLessThanOrEqual(170);
+      expect(hue(t.warning)).toBeGreaterThanOrEqual(30);
+      expect(hue(t.warning)).toBeLessThanOrEqual(60);
+      expect(new Set([t.success, t.warning, t.destructive]).size).toBe(3);
+    });
+  }
+
+  it("exposes status colors as Tailwind theme colors and in all generated blocks", () => {
+    const theme = readFileSync(new URL("../styles/theme.css", import.meta.url), "utf8");
+    for (const name of statusNames) expect(theme).toContain(`--color-${name}: var(--${name});`);
+    const css = renderTokensCss();
+    for (const name of ["success", "warning"]) {
+      expect(css.match(new RegExp(`--${name}:`, "g"))).toHaveLength(3);
+    }
+  });
+
   it("rejects a deliberately invisible UI boundary at the 3:1 threshold", () => {
     expect(violations({ ...tokens.light, border: tokens.light.background }))
       .toContain("border on background: 1.000 < 3 (ui)");
