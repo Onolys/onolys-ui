@@ -3,7 +3,9 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
 
 const config: StorybookConfig = {
-  stories: ["../stories/**/*.stories.@(ts|tsx)"],
+  stories: process.env.STORYBOOK_A11Y_NEGATIVE === "1"
+    ? ["../test/fixtures/a11y-negative.stories.tsx"]
+    : ["../stories/**/*.stories.@(ts|tsx)"],
   framework: "@storybook/react-vite",
   addons: ["@storybook/addon-a11y"],
   core: { disableTelemetry: true },
