@@ -9,6 +9,7 @@ component styles; no release is available yet.
 ## Development
 
 Use Node.js 22.12 or newer. Install the locked dependencies with `npm ci`.
+Install the Chromium browser for the CSS integration tests with `npx playwright install chromium`.
 
 ```sh
 npm run lint
@@ -48,6 +49,27 @@ tokens on footer backgrounds. Shadows and section bands are decorative.
 The light teal primary and score palette preserve the Onolys brand colors. Semantic
 border/input colors are stronger than the original decorative gray. Verdict and
 role colors are adjusted where needed so text also stays readable on selected rows.
+
+## Styles and migration
+
+Import `@onolys/ui/theme.css` after Tailwind CSS in a consumer stylesheet. It includes
+the token variables, base styles, self-hosted Inter, and animation utilities:
+
+```css
+@import "tailwindcss";
+@import "@onolys/ui/theme.css";
+@source "../node_modules/@onolys/ui/dist";
+```
+
+Token colors follow the operating system's light/dark preference. Base styles provide
+a 3px keyboard focus outline, reduced motion, and CSS scroll locking via
+`body[data-scroll-locked]`. The font is covered by [its own SIL OFL license](fonts/OFL.txt).
+Set the consumer bundler's asset inline limit to zero to keep the font as a same-origin URL.
+
+Apps migrating older Onolys CSS may additionally import `@onolys/ui/legacy.css`.
+Its `--color-*` and typography aliases keep existing selectors usable. The legacy
+light gray separator remains `#c7d1d0`; semantic `border` and `input` tokens use the
+stronger accessible boundary color. New utility classes use semantic names directly.
 
 ## Component conventions
 
