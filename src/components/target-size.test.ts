@@ -97,6 +97,12 @@ function assertMinimum(targets: Target[]) {
 }
 
 async function measure(page: Page): Promise<Target[]> {
+  // Visibility does not imply a zooming menu has reached its final hit area.
+  await page.evaluate(async () => {
+    await Promise.all(document.getAnimations()
+      .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+      .map((animation) => animation.finished.catch(() => {})));
+  });
   // Skip links are intentionally visually hidden until focused; measure their active hit area.
   return page.locator("[data-target]").evaluateAll((elements) =>
     elements.map((element) => {
@@ -258,6 +264,20 @@ describe("interactive targets in built Tailwind CSS", () => {
       });
     }
   }
+
+  it("measures a finite entrance animation at its settled size", async () => {
+    const page = await browser.newPage();
+    await page.setContent('<button type="button" data-target="animated-control">Animated</button>');
+    await page.locator("button").evaluate((element) => {
+      Object.assign(element.style, { width: "44px", height: "44px", boxSizing: "border-box" });
+      element.animate([{ transform: "scale(0.95)" }, { transform: "scale(1)" }], {
+        duration: 250,
+        fill: "forwards",
+      });
+    });
+    expect(await measure(page)).toEqual([{ name: "animated-control", width: 44, height: 44 }]);
+    await page.close();
+  });
 
   it("rejects an undersized target injected into the temporary built fixture", async () => {
     const page = await browser.newPage();
