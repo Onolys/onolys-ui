@@ -84,3 +84,9 @@ export {
   TooltipContent,
   TooltipProvider,
 } from "./components/ui/tooltip";
+export { AppHeader, type AppHeaderProps } from "./components/onolys/app-header";
+export { Footer, type FooterProps } from "./components/onolys/footer";
+export { ScoreBadge, type ScoreBadgeProps } from "./components/onolys/score-badge";
+export { UsageMeter, type UsageMeterProps } from "./components/onolys/usage-meter";
+export { SkipLink, type SkipLinkProps } from "./components/onolys/skip-link";
+export { Page, Section } from "./components/onolys/page";
