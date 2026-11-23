@@ -198,6 +198,75 @@ describe("immutable detached release tooling", () => {
     }
   });
 
+  it("keeps the credentialed publisher in the exact trusted checkout and downloads only data outside it", async () => {
+    const workflow = await readFile(
+      join(root, ".github/workflows/release.yml"),
+      "utf8",
+    );
+    const publisher = workflow
+      .split("\n  publish:\n")[1]
+      .split("\n  consumer:\n")[0];
+    expect(publisher).toContain("actions/checkout@");
+    expect(publisher).toContain("ref: ${{ github.sha }}");
+    expect(publisher).toContain("persist-credentials: false");
+    expect(publisher).toContain("path: ${{ runner.temp }}/onolys-ui-release");
+    expect(publisher).toContain("RELEASE_SOURCE: ${{ github.sha }}");
+    expect(publisher).toContain("RELEASE_TRIGGER: ${{ github.ref_name }}");
+    expect(publisher).toContain(
+      'node scripts/release.mjs publish --directory "$RELEASE_DIRECTORY"',
+    );
+    expect(publisher).toContain(
+      '--source "$RELEASE_SOURCE" --trigger "$RELEASE_TRIGGER"',
+    );
+    expect(publisher).not.toContain("node release/release.mjs");
+    expect(publisher).not.toMatch(/npm (?:ci|install)/);
+    expect(workflow).toContain("/onolys-ui-release/release.bundle");
+    expect(workflow).toContain("/onolys-ui-release/release.json");
+    expect(workflow).toContain("/onolys-ui-release/release-notes.md");
+  });
+
+  it.each(["source", "trigger"] as const)(
+    "rejects an artifact with mismatched %s before reading its bundle",
+    async (field) => {
+      const directory = join(fixture, `mismatch-${field}`);
+      await mkdir(directory);
+      const metadata = {
+        repository: "Onolys/onolys-ui",
+        version: "0.1.0",
+        tag: "v0.1.0",
+        source: sourceSha,
+        trigger,
+        commit: "a".repeat(40),
+        [field]: field === "source" ? "b".repeat(40) : "release/v0.2.0",
+      };
+      await writeFile(
+        join(directory, "release.json"),
+        JSON.stringify(metadata),
+      );
+      const result = attempt(
+        process.execPath,
+        [
+          releaseCli,
+          "publish",
+          "--directory",
+          directory,
+          "--repository",
+          "Onolys/onolys-ui",
+          "--source",
+          sourceSha,
+          "--trigger",
+          trigger,
+          "--check-only",
+        ],
+        source,
+      );
+      expect(result.ok).toBe(false);
+      expect(result.output).toContain("trusted workflow context");
+      expect(result.output).not.toContain("release.bundle");
+      expect(result.output).not.toContain("GH_TOKEN");
+    },
+  );
+
   it("builds only a detached commit, refuses overwrites, and installs it from a real local git remote", async () => {
     const built = join(fixture, "detached");
     run("git", ["clone", "--no-hardlinks", source, built], fixture);
@@ -275,6 +344,7 @@ describe("immutable detached release tooling", () => {
     expect(await readFile(join(output, "release-notes.md"), "utf8")).toContain(
       "Shared design tokens",
     );
+    await expect(readFile(join(output, "release.mjs"))).rejects.toThrow();
     const check = JSON.parse(
       run(
         process.execPath,
@@ -285,6 +355,10 @@ describe("immutable detached release tooling", () => {
           output,
           "--repository",
           "Onolys/onolys-ui",
+          "--source",
+          sourceSha,
+          "--trigger",
+          trigger,
           "--check-only",
         ],
         source,
@@ -301,6 +375,10 @@ describe("immutable detached release tooling", () => {
         output,
         "--repository",
         "elsewhere/unsafe",
+        "--source",
+        sourceSha,
+        "--trigger",
+        trigger,
         "--check-only",
       ],
       source,

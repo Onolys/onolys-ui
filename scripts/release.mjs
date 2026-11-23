@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import {
   appendFile,
-  copyFile,
   lstat,
   mkdir,
   mkdtemp,
@@ -173,20 +172,34 @@ async function build(cwd, values) {
     JSON.stringify(metadata, null, 2) + "\n",
   );
   await writeFile(join(output, "release-notes.md"), notes);
-  await copyFile(join(cwd, "scripts/release.mjs"), join(output, "release.mjs"));
   return metadata;
 }
-async function inspectArtifact(directory, expectedRepository, use) {
+async function inspectArtifact(
+  directory,
+  expectedRepository,
+  expectedIdentity,
+  use,
+) {
   if (expectedRepository !== repository)
     throw new Error(`Release repository must be ${repository}`);
   const artifact = resolve(directory ?? "");
-  for (const name of ["release.json", "release.bundle", "release-notes.md"])
+  for (const name of ["release.json"])
     if (!(await lstat(join(artifact, name))).isFile())
       throw new Error("Release artifact must contain regular files");
   const metadata = JSON.parse(
     await readFile(join(artifact, "release.json"), "utf8"),
   );
-  const info = releaseIdentity(metadata.trigger, metadata.source);
+  if (
+    metadata.source !== expectedIdentity.source ||
+    metadata.trigger !== expectedIdentity.trigger
+  )
+    throw new Error(
+      "Release artifact source and trigger must match the trusted workflow context",
+    );
+  const info = expectedIdentity;
+  for (const name of ["release.bundle", "release-notes.md"])
+    if (!(await lstat(join(artifact, name))).isFile())
+      throw new Error("Release artifact must contain regular files");
   if (
     metadata.repository !== repository ||
     metadata.tag !== info.tag ||
@@ -269,6 +282,7 @@ async function publish(values) {
   return inspectArtifact(
     values.directory,
     values.repository,
+    releaseIdentity(values.trigger, values.source),
     async ({ metadata, notes, temporary }) => {
       if (values["check-only"]) return { validated: true, ...metadata };
       const token = process.env.GH_TOKEN;
