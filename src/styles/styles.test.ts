@@ -139,7 +139,8 @@ describe("built Tailwind theme in Chromium", () => {
 
   it("applies a visible 3px focus ring, reduced motion, and CSS scroll locking", async () => {
     await page.keyboard.press("Tab");
-    expect(await page.locator("button").evaluate((button) => {
+    // Even the reduced 0.01ms color transition settles on a later browser frame.
+    await expect.poll(() => page.locator("button").evaluate((button) => {
       const styles = getComputedStyle(button);
       return { width: styles.outlineWidth, style: styles.outlineStyle, color: styles.outlineColor };
     })).toEqual({ width: "3px", style: "solid", color: "rgb(11, 95, 90)" });
