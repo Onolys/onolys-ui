@@ -2,9 +2,8 @@
 
 Shared design tokens, styles, and React components for Onolys.
 
-This repository will provide the `@onolys/ui` design system. The package currently
-contains light and dark design tokens and accessible React primitives; no release
-is available yet.
+The `@onolys/ui` design system provides light and dark design tokens and accessible
+React primitives. Published versions are available from the repository’s Git tags.
 
 ## Development
 
@@ -140,6 +139,41 @@ npx shadcn@latest add button --diff
 
 The second command previews changes without writing a component. Upstream defaults
 still require review for Onolys sizing, theme, and accessibility requirements.
+
+## Releases
+
+After independent review and green PR checks, create a trigger tag on the exact
+approved source commit. For the prepared first release:
+
+```sh
+git tag release/v0.1.0 <approved-source-commit>
+git push origin refs/tags/release/v0.1.0
+```
+
+The workflow reruns CI on that source, builds a detached child commit, and creates
+`v0.1.0` on the built commit. It never updates a branch or moves an existing install
+tag. `dist/` stays out of source branches and `main`. Version numbers in package.json,
+package-lock.json and the dated CHANGELOG.md release section must agree before review.
+Release notes come from that changelog section.
+
+Only the detached release manifest removes maintainer scripts and devDependencies;
+its lock root metadata follows the same change. npm treats a git package containing
+`build` as needing preparation even without `prepare`, so source scripts must not
+remain in the install tag. The source checkout keeps its normal development scripts.
+
+Before publishing, the workflow installs the built tag from a temporary local bare
+git remote and renders Button/Dialog with Vite and Tailwind. After publication it
+runs an unauthenticated `github:Onolys/onolys-ui#v0.1.0` install, scoped to HTTPS with
+a disposable npm cache and configuration, and repeats the browser smoke.
+
+```sh
+npm test -- src/release.test.ts --maxWorkers=1
+node scripts/release-smoke.mjs --spec github:Onolys/onolys-ui#v0.1.0
+```
+
+The smoke command requires the tag to exist. Existing tags at another commit are
+rejected. A failed publish job can resume with the same immutable build artifact;
+a failed public install check can be rerun without changing the tag.
 
 ## License
 

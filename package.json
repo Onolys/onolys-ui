@@ -1,6 +1,6 @@
 {
   "name": "@onolys/ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Shared design tokens, styles, and React components for Onolys.",
   "type": "module",
   "license": "MIT",
@@ -39,7 +39,8 @@
     "components.json",
     "LICENSE",
     "README.md",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "lint": "eslint . --max-warnings 0",
