@@ -103,6 +103,9 @@ try {
         if (story.title === "UI/DropdownMenu" && story.name === "Open") {
           await page.getByRole("menuitem", { name: /^Edit/ }).focus();
           await page.keyboard.press("ArrowDown");
+          // Radix schedules roving focus after the key event; await the exact destination.
+          await page.waitForFunction(() => document.activeElement?.getAttribute("role") === "menuitem"
+            && document.activeElement.textContent === "Remove");
           assert.equal(await page.getByRole("menuitem", { name: "Remove", exact: true }).evaluate((node) => node === document.activeElement), true);
           await page.keyboard.press("Escape");
           await page.getByRole("menu").waitFor({ state: "hidden" });
