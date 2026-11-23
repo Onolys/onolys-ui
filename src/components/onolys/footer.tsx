@@ -15,7 +15,7 @@ export function Footer({
   return (
     <footer
       data-slot="footer"
-      className={cn("space-y-4 bg-footer-bg px-gutter py-8 text-footer-text [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center [&_a]:text-footer-link [&_a:focus-visible]:outline-footer-link", className)}
+      className={cn("space-y-4 bg-footer-bg px-gutter py-8 text-footer-text [&_a]:inline-flex [&_a]:min-h-11 [&_a]:min-w-11 [&_a]:items-center [&_a]:text-footer-link [&_a:focus-visible]:outline-footer-link", className)}
       {...props}
     >
       {notices}

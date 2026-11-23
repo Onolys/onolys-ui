@@ -18,11 +18,11 @@ export function AppHeader({
       className={cn("flex min-h-header flex-wrap items-center gap-x-6 gap-y-2 border-b border-border bg-background px-gutter py-2 text-foreground", className)}
       {...props}
     >
-      <div data-slot="app-header-brand" className="mr-auto flex items-center font-semibold [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
+      <div data-slot="app-header-brand" className="mr-auto flex items-center font-semibold [&_a]:inline-flex [&_a]:min-h-11 [&_a]:min-w-11 [&_a]:items-center">
         {brand}
       </div>
       {navigation != null && navigation !== false && (
-        <nav aria-label={navigationLabel} className="flex flex-wrap items-center gap-4 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
+        <nav aria-label={navigationLabel} className="flex flex-wrap items-center gap-4 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:min-w-11 [&_a]:items-center">
           {navigation}
         </nav>
       )}

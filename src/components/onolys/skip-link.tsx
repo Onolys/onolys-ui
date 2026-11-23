@@ -23,7 +23,7 @@ export function SkipLink({
       data-slot="skip-link"
       href={`#${encodeURIComponent(targetId)}`}
       onClick={focusTarget}
-      className={cn("sr-only min-h-11 items-center rounded-md bg-background px-4 py-2 text-primary focus:not-sr-only focus:absolute focus:top-4 focus:left-gutter focus:z-50 focus:inline-flex", className)}
+      className={cn("sr-only min-h-11 min-w-11 items-center rounded-md bg-background px-4 py-2 text-primary focus:not-sr-only focus:absolute focus:top-4 focus:left-gutter focus:z-50 focus:inline-flex", className)}
       {...props}
     >
       {children}
