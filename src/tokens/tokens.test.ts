@@ -35,20 +35,41 @@ describe("generated token CSS", () => {
     expect(css).toBe(renderTokensCss());
     expect(css).toMatch(/^\/\* Generated/);
     expect(css).toContain("@media (prefers-color-scheme: dark) {");
+    expect(css).toContain(':root:not([data-theme="light"]) {');
+    expect(css).toContain(':root[data-theme="dark"] {');
     expect(css).not.toContain(".dark");
   });
 
   it("declares every token exactly once in each theme with the source value", () => {
     const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
-    const blocks = [...css.matchAll(/:root\s*\{([^}]+)\}/g)];
-    expect(blocks).toHaveLength(2);
-    themes.forEach((theme, index) => {
+    const blocks = [...css.matchAll(/:root[^{]*\{([^}]+)\}/g)];
+    expect(blocks).toHaveLength(3);
+    [...themes, "dark" as Theme].forEach((theme, index) => {
       const declarations = [...blocks[index][1].matchAll(/--([\w-]+):\s*([^;]+);/g)]
         .map(([, name, value]) => [name, value]);
       expect(declarations).toHaveLength(Object.keys(tokens[theme]).length);
       expect(Object.fromEntries(declarations)).toEqual(tokens[theme]);
     });
     expect(Object.keys(tokens.light)).toEqual(Object.keys(tokens.dark));
+  });
+
+  it("supports a manual data-theme override with identical dark values", () => {
+    const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
+    const media = css.match(/@media \(prefers-color-scheme: dark\) \{\s*:root:not\(\[data-theme="light"\]\) \{([^}]+)\}/);
+    const forced = css.match(/\n:root\[data-theme="dark"\] \{([^}]+)\}/);
+    expect(media).not.toBeNull();
+    expect(forced).not.toBeNull();
+    const norm = (body: string) => [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, n, v]) => `${n}:${v}`);
+    expect(norm(media![1])).toEqual(norm(forced![1]));
+    expect(norm(forced![1]).length).toBeGreaterThan(0);
+    expect(css).not.toContain(':root[data-theme="light"] {');
+  });
+
+  it("sets color-scheme per data-theme and keeps light dark by default", () => {
+    const base = readFileSync(new URL("../styles/base.css", import.meta.url), "utf8");
+    expect(base).toContain("color-scheme: light dark;");
+    expect(base).toMatch(/:root\[data-theme="light"\]\s*\{\s*color-scheme: light;/);
+    expect(base).toMatch(/:root\[data-theme="dark"\]\s*\{\s*color-scheme: dark;/);
   });
 
   it("preserves the light brand and score palette", () => {

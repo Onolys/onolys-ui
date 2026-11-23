@@ -50,7 +50,7 @@ npm test -- src/tokens/tokens.test.ts
 ```
 
 The package's `tokens.css` export declares light variables in `:root` and overrides
-them under `prefers-color-scheme: dark`. The `tokens` export provides `tokens.light`,
+them under `prefers-color-scheme: dark`. Set `data-theme="light"` or `"dark"` on `<html>` to override the OS theme; remove it to follow the OS. The `tokens` export provides `tokens.light`,
 `tokens.dark`, their TypeScript types, and `contrastPairs`, the supported color
 combinations. Normal text meets 4.5:1, including large text; control boundaries and
 focus rings meet 3:1. Other combinations need their own contrast check. Use a focus

@@ -193,5 +193,6 @@ export function renderTokensCss(): string {
     .join("\n");
   return "/* Generated from tokens.ts by npm run tokens:generate. Do not edit. */\n"
     + `:root {\n${declarations("light", "  ")}\n}\n\n`
-    + `@media (prefers-color-scheme: dark) {\n  :root {\n${declarations("dark", "    ")}\n  }\n}\n`;
+    + `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${declarations("dark", "    ")}\n  }\n}\n\n`
+    + `:root[data-theme="dark"] {\n${declarations("dark", "  ")}\n}\n`;
 }

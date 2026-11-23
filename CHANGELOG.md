@@ -5,6 +5,12 @@ Versions follow Semantic Versioning; before 1.0, minor releases may break APIs.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-23
+
+### Added
+
+- Manual theme override: set `data-theme="light"` or `data-theme="dark"` on `<html>` to force a theme regardless of the OS setting; with no attribute the theme still follows `prefers-color-scheme`. `color-scheme` follows the override.
+
 ## [0.1.0] - 2026-11-23
 
 ### Added

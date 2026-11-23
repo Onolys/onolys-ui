@@ -34,7 +34,11 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --legacy-gray-300: var(--border);
   }
+}
+
+:root[data-theme="dark"] {
+  --legacy-gray-300: var(--border);
 }
