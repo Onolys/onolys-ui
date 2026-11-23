@@ -47,7 +47,8 @@
     "build": "tsup && node scripts/copy-styles.mjs",
     "build:watch": "tsup --watch --onSuccess \"node scripts/copy-styles.mjs\"",
     "storybook": "storybook dev -p 6006 --disable-telemetry",
-    "build:storybook": "storybook build --disable-telemetry"
+    "build:storybook": "storybook build --disable-telemetry",
+    "tokens:generate": "node --experimental-strip-types scripts/generate-tokens.mjs"
   },
   "peerDependencies": {
     "react": ">=19",
