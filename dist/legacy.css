@@ -1,0 +1,40 @@
+@import "./tokens.css";
+
+/* Temporary aliases for apps migrating from the original token names. */
+:root {
+  /* Keep the original light separator color; semantic controls use AA boundaries. */
+  --legacy-gray-300: #c7d1d0;
+  --color-background: var(--background);
+  --color-text: var(--foreground);
+  --color-accent: var(--primary);
+  --color-on-accent: var(--primary-foreground);
+  --color-gray-50: var(--muted);
+  --color-gray-100: var(--accent);
+  --color-gray-300: var(--legacy-gray-300);
+  --color-gray-600: var(--muted-foreground);
+  --color-gray-900: var(--foreground);
+  --color-score-good: var(--score-good);
+  --color-score-good-background: var(--score-good-bg);
+  --color-score-fair: var(--score-fair);
+  --color-score-fair-background: var(--score-fair-bg);
+  --color-score-low: var(--score-low);
+  --color-score-low-background: var(--score-low-bg);
+  --hdr: var(--header-h);
+  --font-family-sans: var(--font-sans);
+  --line-height-body: var(--leading-body);
+  --line-height-heading: var(--leading-heading);
+  --font-size-xs: var(--text-xs);
+  --font-size-sm: var(--text-sm);
+  --font-size-base: var(--text-base);
+  --font-size-lg: var(--text-lg);
+  --font-size-xl: var(--text-xl);
+  --font-size-2xl: var(--text-2xl);
+  --font-size-3xl: var(--text-3xl);
+  --font-size-4xl: var(--text-4xl);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --legacy-gray-300: var(--border);
+  }
+}

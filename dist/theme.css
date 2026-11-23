@@ -1,0 +1,91 @@
+@import "./tokens.css";
+@import "./fonts.css";
+@import "./base.css";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-score-good: var(--score-good);
+  --color-score-good-bg: var(--score-good-bg);
+  --color-score-fair: var(--score-fair);
+  --color-score-fair-bg: var(--score-fair-bg);
+  --color-score-low: var(--score-low);
+  --color-score-low-bg: var(--score-low-bg);
+  --color-tone-hero: var(--tone-hero);
+  --color-tone-features: var(--tone-features);
+  --color-tone-evaluates: var(--tone-evaluates);
+  --color-tone-compare: var(--tone-compare);
+  --color-tone-team: var(--tone-team);
+  --color-tone-benefits: var(--tone-benefits);
+  --color-tone-footer: var(--tone-footer);
+  --color-footer-bg: var(--footer-bg);
+  --color-footer-text: var(--footer-text);
+  --color-footer-link: var(--footer-link);
+  --color-footer-muted: var(--footer-muted);
+  --color-verdict-supported: var(--verdict-supported);
+  --color-verdict-partially-supported: var(--verdict-partially-supported);
+  --color-verdict-contradicted: var(--verdict-contradicted);
+  --color-verdict-insufficient-evidence: var(--verdict-insufficient-evidence);
+  --color-verdict-out-of-scope: var(--verdict-out-of-scope);
+  --color-role-supporting: var(--role-supporting);
+  --color-role-contradicting: var(--role-contradicting);
+  --color-role-qualifying: var(--role-qualifying);
+  --color-selected: var(--selected);
+
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-12: var(--space-12);
+  --spacing-16: var(--space-16);
+  --spacing-24: var(--space-24);
+  --spacing-header: var(--header-h);
+  --spacing-header-h: var(--header-h);
+  --spacing-gutter: var(--gutter);
+
+  /* These names already belong to Tailwind. Concrete values avoid var(--x) cycles. */
+  /* styles.test.ts checks them against the shared token source. */
+  --font-sans: 'Inter Variable', sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 3rem;
+  --text-4xl: 4rem;
+  --leading-body: 1.6;
+  --leading-heading: 1.15;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --shadow-md: var(--shadow);
+}
+
+/* Non-inline utilities read the unlayered light/dark shadow tokens at runtime. */
+@theme {
+  --shadow-sm: 0 1px 2px rgb(23 28 28 / 0.08);
+  --shadow-lg: 0 12px 32px rgb(23 28 28 / 0.18);
+}
