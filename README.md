@@ -3,8 +3,8 @@
 Shared design tokens, styles, and React components for Onolys.
 
 This repository will provide the `@onolys/ui` design system. The package currently
-contains light and dark design tokens, a toolchain smoke component, and placeholder
-component styles; no release is available yet.
+contains light and dark design tokens and accessible React primitives; no release
+is available yet.
 
 ## Development
 
@@ -81,6 +81,18 @@ an empty Tailwind config path, CSS variables, and `src/styles/theme.css` as the
 CSS entry. The theme uses `@theme inline` and imports `tw-animate-css`. Components
 use `data-slot` attributes and React 19 ref props. See the
 [shadcn Tailwind v4 conventions](https://ui.shadcn.com/docs/tailwind-v4).
+
+The named package exports include Button, Input, Label, Textarea, Select, Checkbox,
+Tabs, Card, Badge, Alert, Table, Dialog, AlertDialog, DropdownMenu, Separator,
+Skeleton, Tooltip, and their composition helpers. Interactive defaults have at
+least a 44px target; all button size names keep that minimum, including icon sizes.
+Components retain Radix keyboard behavior and accept caller labels and React refs.
+Use DialogTitle/DialogDescription and AlertDialogTitle/AlertDialogDescription to
+name and describe overlays, and wrap tooltips in TooltipProvider.
+
+The primitives come from the new-york registry through shadcn CLI 4.23.0, with
+Onolys semantic colors, automatic dark mode, and opaque 3px focus rings. The
+upstream MIT notice is included in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 Run shadcn inside this repository when reviewing upstream component changes:
 
