@@ -8,7 +8,8 @@ is available yet.
 
 ## Development
 
-Use Node.js 22.12 or newer. Install the locked dependencies with `npm ci`.
+Use Node.js 22.23.4 or newer for the full test toolchain, including Astro 7.
+The package engine remains Node.js 22.12+. Install the locked dependencies with `npm ci`.
 Install the Chromium browser for the CSS integration tests with `npx playwright install chromium`.
 
 ```sh
@@ -18,6 +19,17 @@ npm test
 npm run build
 npm run build:storybook
 ```
+
+Run the packed Vite and Astro consumer checks independently with:
+
+```sh
+npm test -- src/consumer-fixtures.test.ts
+```
+
+They install the tarball into separate temporary consumers, build both frameworks,
+and verify strict CSP, automatic dark mode, same-origin font files, and the package
+`@source` recipe. Negative controls remove `@source` and inject an inline stylesheet.
+The Astro consumer imports only theme CSS and builds without React peers or client JavaScript.
 
 `npm run storybook` starts the component workshop. `npm run build:watch` rebuilds
 package source and copies its CSS when source files change.
