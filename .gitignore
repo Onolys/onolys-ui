@@ -1,0 +1,15 @@
+node_modules/
+coverage/
+.storybook-cache/
+storybook-static/
+*.tsbuildinfo
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.worktrees/
+**/_next-context_.md
+
+# Built package files are committed only on release tag commits.
+dist/
