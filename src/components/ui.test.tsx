@@ -38,9 +38,11 @@ import {
   DropdownMenuTrigger,
   Input,
   Label,
+  Progress,
   Select,
   Separator,
   Skeleton,
+  Spinner,
   Table,
   TableBody,
   TableCaption,
@@ -575,6 +577,42 @@ describe("Skeleton", () => {
       "bg-accent",
       "h-8",
     );
+  });
+});
+
+describe("Spinner", () => {
+  it("is decorative, spins only with motion allowed, and keeps a static ring otherwise", () => {
+    const ref = createRef<HTMLSpanElement>();
+    const { container } = render(<Spinner ref={ref} className="size-6" />);
+    const spinner = container.querySelector('[data-slot="spinner"]');
+    expect(spinner).toBe(ref.current);
+    expect(spinner).toHaveAttribute("aria-hidden", "true");
+    expect(spinner).toHaveClass("motion-safe:animate-spin", "size-6");
+    expect(spinner).not.toHaveClass("animate-spin");
+    expect(spinner).toHaveClass("motion-reduce:border-t-current");
+  });
+});
+
+describe("Progress", () => {
+  it("renders a native progress with value, max and the caller label", () => {
+    const ref = createRef<HTMLProgressElement>();
+    render(
+      <Progress ref={ref} value={40} max={100} aria-label="Overall progress" aria-valuetext="40 percent" />,
+    );
+    const bar = screen.getByRole("progressbar", { name: "Overall progress" });
+    expect(bar.tagName).toBe("PROGRESS");
+    expect(bar).toBe(ref.current);
+    expect(bar).toHaveAttribute("value", "40");
+    expect(bar).toHaveAttribute("max", "100");
+    expect(bar).toHaveAttribute("aria-valuetext", "40 percent");
+    expect(bar.className).toContain("motion-safe:");
+  });
+
+  it("defaults max to 100 and merges className", () => {
+    render(<Progress value={10} aria-label="Upload" className="h-4" />);
+    const bar = screen.getByRole("progressbar", { name: "Upload" });
+    expect(bar).toHaveAttribute("max", "100");
+    expect(bar).toHaveClass("h-4");
   });
 });
 

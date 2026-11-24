@@ -1,5 +1,5 @@
 export const requiredStoryTitles = [
-  ...["Button", "Input", "Label", "Textarea", "Select", "Checkbox", "Tabs", "Card", "Badge", "Alert", "Table", "Dialog", "AlertDialog", "DropdownMenu", "Separator", "Skeleton", "Tooltip"].map((name) => `UI/${name}`),
+  ...["Button", "Input", "Label", "Textarea", "Select", "Checkbox", "Tabs", "Card", "Badge", "Alert", "Table", "Dialog", "AlertDialog", "DropdownMenu", "Separator", "Skeleton", "Spinner", "Progress", "Tooltip"].map((name) => `UI/${name}`),
   ...["AppHeader", "Footer", "ScoreBadge", "UsageMeter", "SkipLink", "Page", "Section"].map((name) => `Onolys/${name}`),
 ];
 

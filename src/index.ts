@@ -57,9 +57,11 @@ export {
 } from "./components/ui/dropdown-menu";
 export { Input } from "./components/ui/input";
 export { Label } from "./components/ui/label";
+export { Progress } from "./components/ui/progress";
 export { Select } from "./components/ui/select";
 export { Separator } from "./components/ui/separator";
 export { Skeleton } from "./components/ui/skeleton";
+export { Spinner } from "./components/ui/spinner";
 export {
   Table,
   TableHeader,

@@ -5,6 +5,13 @@ Versions follow Semantic Versioning; before 1.0, minor releases may break APIs.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-24
+
+### Added
+
+- `Spinner`: decorative busy ring that spins only under `motion-safe` and stays a static ring under reduced motion.
+- `Progress`: native `<progress>` styled with tokens; takes caller `aria-label`/`aria-valuetext`, no fill transition under reduced motion.
+
 ## [0.2.0] - 2026-11-23
 
 ### Added
