@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import type { AuthService, AuthUser } from "./types";
 
 export type AuthPhase = "loading" | "signedOut" | "unverified" | "verified";
@@ -46,21 +47,22 @@ export function AuthProvider({
   const signedIn = useRef(false);
   // undefined until the first report; afterwards the uid (null = signed out).
   const lastUid = useRef<string | null | undefined>(undefined);
-  useEffect(
-    () =>
-      service.onAuthStateChanged((user) => {
-        const uid = user?.uid ?? null;
-        // Different user (or signed out by any route: other tab, revoked token): nothing of the old one may linger.
-        if (lastUid.current !== undefined && lastUid.current !== uid) {
-          queryClient.clear();
-          onSignOutRef.current?.();
-        }
-        lastUid.current = uid;
-        signedIn.current = user !== null;
-        setState({ status: "ready", user });
-      }),
-    [service, queryClient],
+  // The one place state follows the SDK: the listener, and sign-out (which must not wait for the listener's later report).
+  const report = useCallback(
+    (user: AuthUser | null) => {
+      const uid = user?.uid ?? null;
+      // Different user (or signed out by any route: other tab, revoked token): nothing of the old one may linger.
+      if (lastUid.current !== undefined && lastUid.current !== uid) {
+        queryClient.clear();
+        onSignOutRef.current?.();
+      }
+      lastUid.current = uid;
+      signedIn.current = user !== null;
+      setState({ status: "ready", user });
+    },
+    [queryClient],
   );
+  useEffect(() => service.onAuthStateChanged(report), [service, report]);
 
   // One sign-out at a time: queries still mounted after clear() may 401 again before the guard navigates.
   const inflight = useRef<Promise<void> | null>(null);
@@ -69,13 +71,16 @@ export function AuthProvider({
     inflight.current ??= (async () => {
       try {
         await service.signOut();
+        // Flip to signed out now so callers navigate after the guards already agree; the listener's later report is a no-op.
+        // Rendered synchronously: guards redirect (and settle) before the caller navigates.
+        flushSync(() => report(null));
         queryClient.clear();
       } finally {
         inflight.current = null;
       }
     })();
     return inflight.current;
-  }, [service, queryClient]);
+  }, [service, queryClient, report]);
 
   const value = useMemo(
     () => ({ service, ...state, phase: phaseOf(state.status, state.user), signOut }),

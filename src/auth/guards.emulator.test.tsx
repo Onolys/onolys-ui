@@ -2,6 +2,7 @@ import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { here, localPart, renderAuthApp, testService } from "../../test/renderAuthApp";
 import { useAuth } from "./AuthProvider";
+import { useSignOut } from "./useSignOut";
 import { RequireVerified } from "./guards";
 import { signUpTestUser } from "./testing";
 
@@ -90,6 +91,26 @@ function deferred() {
 
 // The api client's 401 retry lives in the app (it needs the app's API); what the package owns is the forced token
 // refresh on the real service and the sign-out the client triggers after a second 401.
+function SignOutViaHook() {
+  const { signOut } = useSignOut();
+  return <button onClick={() => void signOut()}>Sign out via hook</button>;
+}
+
+describe("useSignOut from a protected page", () => {
+  it("lands on a plain /login, without next", async () => {
+    const { router } = await renderAuthApp("/settings", {
+      user: { verified: true },
+      routes: [
+        { path: "/login", element: <h1>Log in</h1> },
+        { element: <RequireVerified />, children: [{ path: "/settings", element: <SignOutViaHook /> }] },
+      ],
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Sign out via hook" }));
+    await screen.findByRole("heading", { name: "Log in" });
+    expect(here(router)).toBe("/login");
+  });
+});
+
 describe("token refresh and sign-out", () => {
   it("a forced refresh on the real service yields a token and keeps the user signed in on the page", async () => {
     const service = testService();
