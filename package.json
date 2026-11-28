@@ -1,12 +1,12 @@
 {
-  "name": "@onolys/ui",
+  "name": "@onolys/common",
   "version": "0.3.0",
   "description": "Shared design tokens, styles, and React components for Onolys.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Onolys/onolys-ui.git"
+    "url": "git+https://github.com/Onolys/onolys-common.git"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -47,6 +47,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:auth": "vitest run --passWithNoTests emulator.test",
     "build": "tsup && node scripts/copy-styles.mjs",
     "build:watch": "tsup --watch src --watch scripts --onSuccess \"node scripts/copy-styles.mjs\"",
     "storybook": "storybook dev -p 6006 --disable-telemetry",

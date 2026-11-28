@@ -2,7 +2,7 @@
 
 Shared design tokens, styles, and React components for Onolys.
 
-The `@onolys/ui` design system provides light and dark design tokens and accessible
+The `@onolys/common` design system provides light and dark design tokens and accessible
 React primitives. Published versions are available from the repository’s Git tags.
 
 ## Development
@@ -63,13 +63,13 @@ role colors are adjusted where needed so text also stays readable on selected ro
 
 ## Styles and migration
 
-Import `@onolys/ui/theme.css` after Tailwind CSS in a consumer stylesheet. It includes
+Import `@onolys/common/theme.css` after Tailwind CSS in a consumer stylesheet. It includes
 the token variables, base styles, self-hosted Inter, and animation utilities:
 
 ```css
 @import "tailwindcss";
-@import "@onolys/ui/theme.css";
-@source "../node_modules/@onolys/ui/dist";
+@import "@onolys/common/theme.css";
+@source "../node_modules/@onolys/common/dist";
 ```
 
 Token colors follow the operating system's light/dark preference. Base styles provide
@@ -77,7 +77,7 @@ a 3px keyboard focus outline, reduced motion, and CSS scroll locking via
 `body[data-scroll-locked]`. The font is covered by [its own SIL OFL license](fonts/OFL.txt).
 Set the consumer bundler's asset inline limit to zero to keep the font as a same-origin URL.
 
-Apps migrating older Onolys CSS may additionally import `@onolys/ui/legacy.css`.
+Apps migrating older Onolys CSS may additionally import `@onolys/common/legacy.css`.
 Its `--color-*` and typography aliases keep existing selectors usable. The legacy
 light gray separator remains `#c7d1d0`; semantic `border` and `input` tokens use the
 stronger accessible boundary color. New utility classes use semantic names directly.
@@ -163,12 +163,12 @@ remain in the install tag. The source checkout keeps its normal development scri
 
 Before publishing, the workflow installs the built tag from a temporary local bare
 git remote and renders Button/Dialog with Vite and Tailwind. After publication it
-runs an unauthenticated `github:Onolys/onolys-ui#v0.1.0` install, scoped to HTTPS with
+runs an unauthenticated `github:Onolys/onolys-common#v0.1.0` install, scoped to HTTPS with
 a disposable npm cache and configuration, and repeats the browser smoke.
 
 ```sh
 npm test -- src/release.test.ts --maxWorkers=1
-node scripts/release-smoke.mjs --spec github:Onolys/onolys-ui#v0.1.0
+node scripts/release-smoke.mjs --spec github:Onolys/onolys-common#v0.1.0
 ```
 
 The smoke command requires the tag to exist. Existing tags at another commit are

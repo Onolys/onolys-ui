@@ -128,7 +128,7 @@ describe("packaged ESM and declaration contract", () => {
         private: true,
         type: "module",
         dependencies: {
-          "@onolys/ui": `file:${join(fixture, packed.filename)}`,
+          "@onolys/common": `file:${join(fixture, packed.filename)}`,
           react: manifest.devDependencies.react,
           "react-dom": manifest.devDependencies["react-dom"],
           tailwindcss: manifest.devDependencies.tailwindcss,
@@ -167,8 +167,8 @@ describe("packaged ESM and declaration contract", () => {
       join(consumer, "consumer.tsx"),
       `
       import { createRef, type ComponentProps } from 'react';
-      import { AppHeader, Footer, SkipLink, Page, Section, Button, Input, Select, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Tooltip, TooltipProvider, TooltipTrigger, TooltipContent, ScoreBadge, UsageMeter, Spinner, Progress, cn, buttonVariants, type AppHeaderProps, type FooterProps, type SkipLinkProps, type UsageMeterProps, type ScoreBadgeProps } from '@onolys/ui';
-      import { tokens, contrastPairs, renderTokensCss, type Theme, type TokenName, type ColorTokenName, type TokenValues, type ContrastPair } from '@onolys/ui/tokens';
+      import { AppHeader, Footer, SkipLink, Page, Section, Button, Input, Select, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Tooltip, TooltipProvider, TooltipTrigger, TooltipContent, ScoreBadge, UsageMeter, Spinner, Progress, cn, buttonVariants, type AppHeaderProps, type FooterProps, type SkipLinkProps, type UsageMeterProps, type ScoreBadgeProps } from '@onolys/common';
+      import { tokens, contrastPairs, renderTokensCss, type Theme, type TokenName, type ColorTokenName, type TokenValues, type ContrastPair } from '@onolys/common/tokens';
       const theme: Theme = 'dark'; const color: ColorTokenName = 'primary'; const name: TokenName = 'radius';
       const values: TokenValues = tokens[theme]; const pair: ContrastPair = contrastPairs[0];
       const css: string = renderTokensCss();
@@ -220,7 +220,7 @@ describe("packaged ESM and declaration contract", () => {
     expect(Object.keys(manifest.exports).sort()).toEqual(
       [...exportsRequired].sort(),
     );
-    const installed = join(consumer, "node_modules/@onolys/ui");
+    const installed = join(consumer, "node_modules/@onolys/common");
     expect((await lstat(installed)).isSymbolicLink()).toBe(false);
     for (const asset of ["base", "tokens"])
       expect(await readFile(join(installed, `dist/${asset}.css`), "utf8")).toBe(
@@ -260,11 +260,11 @@ describe("packaged ESM and declaration contract", () => {
       const specs = ${JSON.stringify(exportsRequired)};
       const resolved = [];
       for (const subpath of specs) {
-        const specifier = subpath === '.' ? '@onolys/ui' : '@onolys/ui/' + subpath.slice(2);
+        const specifier = subpath === '.' ? '@onolys/common' : '@onolys/common/' + subpath.slice(2);
         const path = fileURLToPath(import.meta.resolve(specifier));
         assert.ok((await readFile(path)).length > 0); resolved.push(specifier);
       }
-      const ui = await import('@onolys/ui'); const design = await import('@onolys/ui/tokens');
+      const ui = await import('@onolys/common'); const design = await import('@onolys/common/tokens');
       assert.equal(typeof ui.Button, 'function'); assert.equal(typeof ui.Select, 'function');
       assert.equal(design.tokens.light.primary, '#0b5f5a');
       process.stdout.write(JSON.stringify(resolved));

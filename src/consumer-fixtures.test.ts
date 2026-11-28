@@ -182,7 +182,7 @@ describe("independent packed-tarball consumers", () => {
         private: true,
         type: "module",
         dependencies: {
-          "@onolys/ui": dependency,
+          "@onolys/common": dependency,
           react: versions.react,
           "react-dom": versions["react-dom"],
         },
@@ -199,7 +199,7 @@ describe("independent packed-tarball consumers", () => {
         name: "astro-css-consumer",
         private: true,
         type: "module",
-        dependencies: { "@onolys/ui": dependency },
+        dependencies: { "@onolys/common": dependency },
         devDependencies: {
           astro: versions.astro,
           vite: versions.vite,
@@ -239,7 +239,7 @@ describe("independent packed-tarball consumers", () => {
       join(vite, "src/main.jsx"),
       `
       import React from 'react'; import { createRoot } from 'react-dom/client';
-      import { Page, Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Select } from '@onolys/ui';
+      import { Page, Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Select } from '@onolys/common';
       import './style.css';
       function App() {
         const [result, setResult] = React.useState('Ready'); const [language, setLanguage] = React.useState('en');
@@ -255,8 +255,8 @@ describe("independent packed-tarball consumers", () => {
       createRoot(document.getElementById('root')).render(<App />);
     `,
     );
-    const css = '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n';
-    const scannedCss = css + '@source "../node_modules/@onolys/ui/dist";\n';
+    const css = '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n';
+    const scannedCss = css + '@source "../node_modules/@onolys/common/dist";\n';
     await writeFile(join(vite, "src/style.css"), scannedCss);
     run(
       process.execPath,
@@ -286,7 +286,7 @@ describe("independent packed-tarball consumers", () => {
     );
     await writeFile(
       join(astro, "src/theme.css"),
-      '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n',
+      '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n',
     );
     await writeFile(
       join(astro, "src/pages/index.astro"),
@@ -325,7 +325,7 @@ describe("independent packed-tarball consumers", () => {
     for (const directory of [vite, astro])
       expect(
         (
-          await lstat(join(directory, "node_modules/@onolys/ui"))
+          await lstat(join(directory, "node_modules/@onolys/common"))
         ).isSymbolicLink(),
       ).toBe(false);
     for (const [directory, names] of [
@@ -508,7 +508,7 @@ describe("independent packed-tarball consumers", () => {
     expect(html).not.toContain("<script");
     expect(html).toContain('rel="stylesheet"');
     expect(await readFile(join(astro, "src/theme.css"), "utf8")).toBe(
-      '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n',
+      '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n',
     );
     const page = await browser.newPage({ colorScheme: "light" });
     const fonts = await observe(page);
