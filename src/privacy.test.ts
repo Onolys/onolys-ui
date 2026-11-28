@@ -116,6 +116,19 @@ describe("privacy guard negative controls", () => {
     }
   });
 
+  it("skips only the emulator test helper auth/testing.ts, not other files in auth/", async () => {
+    const fixture = await mkdtemp(join(tmpdir(), "onolys-privacy-"));
+    try {
+      await mkdir(join(fixture, "auth"));
+      await writeFile(join(fixture, "auth/testing.ts"), 'fetch("http://127.0.0.1:9099");');
+      expect(privacyFindings(fixture)).toEqual([]);
+      await writeFile(join(fixture, "auth/other.ts"), 'fetch("http://127.0.0.1:9099");');
+      expect(privacyFindings(fixture)).toContainEqual(expect.objectContaining({ file: "auth/other.ts", rule: "network" }));
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
   it("allows localStorage only in the named theme storage file", async () => {
     const fixture = await mkdtemp(join(tmpdir(), "onolys-privacy-"));
     try {

@@ -15,6 +15,12 @@ export interface PrivacyFinding {
   match: string;
 }
 
+/**
+ * `auth/testing.ts` is the emulator test helper (`@onolys/common/auth/testing`): it talks to the Auth emulator
+ * over HTTP and names its URL. It is never imported by the app runtime, so it is scanned like test code.
+ */
+const testHelper = /(?:^|[\\/])auth[\\/]testing\.ts$/;
+
 /** Test fixtures and declarations do not execute in the shipped component library. */
 export function runtimeSourceFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true })
@@ -24,7 +30,8 @@ export function runtimeSourceFiles(directory: string): string[] {
       if (entry.isDirectory()) return runtimeSourceFiles(path);
       return /\.(?:[cm]?[jt]sx?|css)$/.test(entry.name) &&
         !/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(entry.name) &&
-        !/\.d\.[cm]?ts$/.test(entry.name)
+        !/\.d\.[cm]?ts$/.test(entry.name) &&
+        !testHelper.test(path)
         ? [path]
         : [];
     });
