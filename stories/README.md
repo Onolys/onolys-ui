@@ -1,6 +1,6 @@
 # Component stories
 
-The catalogue has one title for each supported family: 17 UI primitives and seven
+The catalogue has one title for each supported family: 19 UI primitives and fourteen
 Onolys components. Compound exports are shown together in their owning family's
 story. Variants, disabled/invalid/checked states, open overlays, and keyboard entry
 points have dedicated examples.
@@ -9,7 +9,7 @@ Run `npm run storybook` to browse. Theme colors follow `prefers-color-scheme`;
 use the browser's rendering/media emulation to inspect light and dark without
 adding a theme class, storage, or a runtime toggle.
 
-`npm run test:storybook` builds the real catalogue, checks all 24 family titles,
+`npm run test:storybook` builds the real catalogue, checks all 33 family titles,
 and serves it locally for serial Chromium scans with `@axe-core/playwright`.
 The runner emulates light and dark and scans the whole story document, including
 portals. It also exercises button focus, checkbox Space, tab arrow navigation,

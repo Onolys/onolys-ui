@@ -9,3 +9,5 @@ type Story = StoryObj;
 export const Full: Story = { render: () => (<><UI.AppHeader brand={<a href="#home">Example</a>} navigation={<a href="#sessions">Sessions</a>} accountMenu={<UI.Button variant="outline">Account</UI.Button>} /><UI.Page><h1>Welcome</h1></UI.Page></>) };
 
 export const BrandOnly: Story = { render: () => (<><UI.AppHeader brand={<a href="#home">Example</a>} /><UI.Page><h1>Welcome</h1></UI.Page></>) };
+
+export const CenteredNavigation: Story = { render: () => (<><UI.AppHeader centerNavigation brand={<a href="#home">Example</a>} navigation={<><a href="#sessions">Sessions</a><a href="#reports">Reports</a></>} accountMenu={<UI.AccountMenu email="person@example.com" onSignOut={() => {}} />} /><UI.Page><h1>Welcome</h1></UI.Page></>) };

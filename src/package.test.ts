@@ -6,6 +6,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  readdir,
   rm,
   symlink,
   writeFile,
@@ -19,6 +20,9 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const exportsRequired = [
   ".",
   "./tokens",
+  "./auth",
+  "./auth/firebase",
+  "./auth/testing",
   "./theme.css",
   "./tokens.css",
   "./base.css",
@@ -132,6 +136,10 @@ describe("packaged ESM and declaration contract", () => {
           react: manifest.devDependencies.react,
           "react-dom": manifest.devDependencies["react-dom"],
           tailwindcss: manifest.devDependencies.tailwindcss,
+          "react-router": manifest.devDependencies["react-router"],
+          "@tanstack/react-query":
+            manifest.devDependencies["@tanstack/react-query"],
+          firebase: manifest.devDependencies.firebase,
         },
         devDependencies: {
           "@types/react": manifest.devDependencies["@types/react"],
@@ -167,8 +175,13 @@ describe("packaged ESM and declaration contract", () => {
       join(consumer, "consumer.tsx"),
       `
       import { createRef, type ComponentProps } from 'react';
-      import { AppHeader, Footer, SkipLink, Page, Section, Button, Input, Select, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Tooltip, TooltipProvider, TooltipTrigger, TooltipContent, ScoreBadge, UsageMeter, Spinner, Progress, cn, buttonVariants, type AppHeaderProps, type FooterProps, type SkipLinkProps, type UsageMeterProps, type ScoreBadgeProps } from '@onolys/common';
+      import { AppHeader, Footer, SkipLink, Page, Section, Button, Input, Select, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Tooltip, TooltipProvider, TooltipTrigger, TooltipContent, ScoreBadge, UsageMeter, Spinner, Progress, Field, Notice, ErrorNote, StatusChip, SlowStartNotice, ErrorRecovery, AccountMenu, ThemeToggle, cn, buttonVariants, type AppHeaderProps, type FooterProps, type SkipLinkProps, type UsageMeterProps, type ScoreBadgeProps } from '@onolys/common';
       import { tokens, contrastPairs, renderTokensCss, type Theme, type TokenName, type ColorTokenName, type TokenValues, type ContrastPair } from '@onolys/common/tokens';
+      import { AuthProvider, Login, RequireVerified, useAuth, type AuthService } from '@onolys/common/auth';
+      import { createFirebaseAuthService } from '@onolys/common/auth/firebase';
+      import { EMULATOR_URL, TEST_PASSWORD } from '@onolys/common/auth/testing';
+      const authService: () => AuthService = () => createFirebaseAuthService({ apiKey: 'k', authDomain: 'd', projectId: 'p', appId: 'a' }, { emailApi: null });
+      void [AuthProvider, Login, RequireVerified, useAuth, authService, EMULATOR_URL, TEST_PASSWORD];
       const theme: Theme = 'dark'; const color: ColorTokenName = 'primary'; const name: TokenName = 'radius';
       const values: TokenValues = tokens[theme]; const pair: ContrastPair = contrastPairs[0];
       const css: string = renderTokensCss();
@@ -178,7 +191,7 @@ describe("packaged ESM and declaration contract", () => {
       const usage: UsageMeterProps = { label: 'Usage', used: 1, cap: 2 };
       const score: ScoreBadgeProps = { variant: 'good', children: '3' };
       const select: ComponentProps<typeof Select> = { required: true, name: 'language', defaultValue: 'en', onChange: event => { const value: string = event.currentTarget.value; void value; } };
-      export const app = <><SkipLink {...skip} /><AppHeader {...header} /><Page><Section><Button ref={createRef<HTMLButtonElement>()} size="icon" aria-label="Action" className={cn(buttonVariants({ variant: 'outline' }))}>+</Button><Input ref={createRef<HTMLInputElement>()} aria-label="Name" /><Select {...select} ref={createRef<HTMLSelectElement>()}><option value="en">English</option></Select><Checkbox aria-label="Accept" /><Tabs defaultValue="one"><TabsList><TabsTrigger value="one">One</TabsTrigger></TabsList><TabsContent value="one">Content</TabsContent></Tabs><ScoreBadge {...score} /><UsageMeter {...usage} /><Spinner /><Progress value={1} max={2} aria-label="Progress" /></Section></Page><Footer {...footer} /><Dialog><DialogTrigger>Open</DialogTrigger><DialogContent><DialogTitle>Title</DialogTitle><DialogDescription>Details</DialogDescription></DialogContent></Dialog><AlertDialog><AlertDialogContent><AlertDialogTitle>Confirm</AlertDialogTitle><AlertDialogDescription>Details</AlertDialogDescription><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction>Confirm</AlertDialogAction></AlertDialogContent></AlertDialog><DropdownMenu><DropdownMenuTrigger>Menu</DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem>Item</DropdownMenuItem></DropdownMenuContent></DropdownMenu><TooltipProvider><Tooltip><TooltipTrigger>Help</TooltipTrigger><TooltipContent>Details</TooltipContent></Tooltip></TooltipProvider></>;
+      export const app = <><SkipLink {...skip} /><AppHeader {...header} /><Page><Section><Button ref={createRef<HTMLButtonElement>()} size="icon" aria-label="Action" className={cn(buttonVariants({ variant: 'outline' }))}>+</Button><Input ref={createRef<HTMLInputElement>()} aria-label="Name" /><Select {...select} ref={createRef<HTMLSelectElement>()}><option value="en">English</option></Select><Checkbox aria-label="Accept" /><Tabs defaultValue="one"><TabsList><TabsTrigger value="one">One</TabsTrigger></TabsList><TabsContent value="one">Content</TabsContent></Tabs><ScoreBadge {...score} /><UsageMeter {...usage} /><Spinner /><Field label="Email">{id => <Input id={id} />}</Field><Notice>Note</Notice><ErrorNote>Error</ErrorNote><StatusChip tone="done">Done</StatusChip><SlowStartNotice pending={false} /><ErrorRecovery status={404} /><AccountMenu email="a@b.c" onSignOut={() => {}} /><ThemeToggle /><Progress value={1} max={2} aria-label="Progress" /></Section></Page><Footer {...footer} /><Dialog><DialogTrigger>Open</DialogTrigger><DialogContent><DialogTitle>Title</DialogTitle><DialogDescription>Details</DialogDescription></DialogContent></Dialog><AlertDialog><AlertDialogContent><AlertDialogTitle>Confirm</AlertDialogTitle><AlertDialogDescription>Details</AlertDialogDescription><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction>Confirm</AlertDialogAction></AlertDialogContent></AlertDialog><DropdownMenu><DropdownMenuTrigger>Menu</DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem>Item</DropdownMenuItem></DropdownMenuContent></DropdownMenu><TooltipProvider><Tooltip><TooltipTrigger>Help</TooltipTrigger><TooltipContent>Details</TooltipContent></Tooltip></TooltipProvider></>;
       void [values[color], values[name], pair, css];
     `,
     );
@@ -196,6 +209,12 @@ describe("packaged ESM and declaration contract", () => {
         "dist/index.d.ts",
         "dist/tokens/tokens.js",
         "dist/tokens/tokens.d.ts",
+        "dist/auth/index.js",
+        "dist/auth/index.d.ts",
+        "dist/auth/firebase.js",
+        "dist/auth/firebase.d.ts",
+        "dist/auth/testing.js",
+        "dist/auth/testing.d.ts",
         "dist/theme.css",
         "dist/tokens.css",
         "dist/base.css",
@@ -250,6 +269,69 @@ describe("packaged ESM and declaration contract", () => {
     );
   });
 
+  const builtImports = async (entry: string) => {
+    const seen = new Set<string>();
+    const bare = new Set<string>();
+    const walk = async (file: string) => {
+      if (seen.has(file)) return;
+      seen.add(file);
+      const code = await readFile(file, "utf8");
+      for (const [, spec] of code.matchAll(
+        /(?:from|import)\s*["']([^"']+)["']/g,
+      )) {
+        if (spec.startsWith(".")) await walk(resolve(file, "..", spec));
+        else bare.add(spec);
+      }
+    };
+    await walk(join(library, "dist", entry));
+    return { files: seen, bare: [...bare] };
+  };
+
+  it("keeps router, react-query and firebase out of the root entry graph", async () => {
+    const { bare } = await builtImports("index.js");
+    expect(bare.filter((spec) => /^(react-router|@tanstack|firebase)/.test(spec))).toEqual([]);
+    expect(bare).toContain("react");
+  });
+
+  it("scopes optional peers to their own entries", async () => {
+    const auth = await builtImports("auth/index.js");
+    expect(auth.bare.some((spec) => spec.startsWith("react-router"))).toBe(true);
+    expect(auth.bare.some((spec) => spec.startsWith("@tanstack/react-query"))).toBe(true);
+    expect(auth.bare.filter((spec) => spec.startsWith("firebase"))).toEqual([]);
+    const firebase = await builtImports("auth/firebase.js");
+    expect(firebase.bare.some((spec) => spec.startsWith("firebase"))).toBe(true);
+    expect(firebase.bare.filter((spec) => /^(react-router|@tanstack)/.test(spec))).toEqual([]);
+    const testing = await builtImports("auth/testing.js");
+    expect(testing.bare.filter((spec) => /^(react-router|@tanstack)/.test(spec))).toEqual([]);
+    expect(manifest.exports).not.toHaveProperty("typesVersions");
+    const meta = (manifest as unknown as { peerDependenciesMeta: Record<string, { optional: boolean }> }).peerDependenciesMeta;
+    for (const peer of ["react-router", "@tanstack/react-query", "firebase"])
+      expect(meta[peer]).toEqual({ optional: true });
+  });
+
+  it("shares one copy of each component between the root and auth entries", async () => {
+    const js: string[] = [];
+    const walk = async (dir: string) => {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) await walk(path);
+        else if (path.endsWith(".js")) js.push(path);
+      }
+    };
+    await walk(join(library, "dist"));
+    for (const marker of [
+      '"data-slot": "button"',
+      '"data-slot": "app-header"',
+      '"data-slot": "label"',
+      "function StatusChip(",
+    ]) {
+      let count = 0;
+      for (const file of js)
+        count += (await readFile(file, "utf8")).split(marker).length - 1;
+      expect(count, marker).toBe(1);
+    }
+  });
+
   it("resolves every public export from the installed tarball and imports its ESM entries", async () => {
     await writeFile(
       join(consumer, "probe.mjs"),
@@ -267,6 +349,8 @@ describe("packaged ESM and declaration contract", () => {
       const ui = await import('@onolys/common'); const design = await import('@onolys/common/tokens');
       assert.equal(typeof ui.Button, 'function'); assert.equal(typeof ui.Select, 'function');
       assert.equal(design.tokens.light.primary, '#0b5f5a');
+      const auth = await import('@onolys/common/auth'); const fb = await import('@onolys/common/auth/firebase'); const testing = await import('@onolys/common/auth/testing');
+      assert.equal(typeof auth.AuthProvider, 'function'); assert.equal(typeof fb.createFirebaseAuthService, 'function'); assert.equal(typeof testing.EMULATOR_URL, 'string');
       process.stdout.write(JSON.stringify(resolved));
     `,
     );

@@ -1,6 +1,6 @@
 export const requiredStoryTitles = [
   ...["Button", "Input", "Label", "Textarea", "Select", "Checkbox", "Tabs", "Card", "Badge", "Alert", "Table", "Dialog", "AlertDialog", "DropdownMenu", "Separator", "Skeleton", "Spinner", "Progress", "Tooltip"].map((name) => `UI/${name}`),
-  ...["AppHeader", "Footer", "ScoreBadge", "UsageMeter", "SkipLink", "Page", "Section"].map((name) => `Onolys/${name}`),
+  ...["AppHeader", "Footer", "ScoreBadge", "UsageMeter", "SkipLink", "Page", "Section", "Field", "Notice", "StatusChip", "SlowStartNotice", "ErrorRecovery", "AccountMenu", "ThemeToggle"].map((name) => `Onolys/${name}`),
 ];
 
 export function assertStoryCoverage(index) {

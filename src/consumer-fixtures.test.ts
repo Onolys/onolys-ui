@@ -26,6 +26,9 @@ const versions = {
   astro: "7.4.13",
   react: "19.3.1",
   "react-dom": "19.3.1",
+  "react-router": "8.5.2",
+  "@tanstack/react-query": "5.108.1",
+  firebase: "13.4.0",
 };
 const policy =
   "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'";
@@ -185,6 +188,9 @@ describe("independent packed-tarball consumers", () => {
           "@onolys/common": dependency,
           react: versions.react,
           "react-dom": versions["react-dom"],
+          "react-router": versions["react-router"],
+          "@tanstack/react-query": versions["@tanstack/react-query"],
+          firebase: versions.firebase,
         },
         devDependencies: {
           vite: versions.vite,
@@ -240,7 +246,11 @@ describe("independent packed-tarball consumers", () => {
       `
       import React from 'react'; import { createRoot } from 'react-dom/client';
       import { Page, Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Select } from '@onolys/common';
+      import { AuthProvider, Login, mapAuthError } from '@onolys/common/auth';
+      import { createFirebaseAuthService } from '@onolys/common/auth/firebase';
       import './style.css';
+      const authSubpaths = new URLSearchParams(location.search).has('auth-probe') ? [AuthProvider, Login, mapAuthError, createFirebaseAuthService] : [];
+      window.authSubpathExports = authSubpaths.length;
       function App() {
         const [result, setResult] = React.useState('Ready'); const [language, setLanguage] = React.useState('en');
         return <Page><h1>Packed consumer</h1><Button id="brand">Brand button</Button>
@@ -499,6 +509,26 @@ describe("independent packed-tarball consumers", () => {
       for (const font of fontFiles)
         expect((await readFile(font)).subarray(0, 4).toString()).toBe("wOF2");
     }
+  });
+
+  it("bundles the root, /auth and /auth/firebase subpaths in the Vite consumer", async () => {
+    const bundle = (await files(viteOutput))
+      .filter((file) => file.endsWith(".js"))
+      .map((file) => readFile(file, "utf8"));
+    const code = (await Promise.all(bundle)).join("\n");
+    expect(code).toContain("auth/wrong-password");
+    const page = await browser.newPage({ colorScheme: "light" });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(`${viteOrigin}?auth-probe`);
+    expect(await page.evaluate(() => (window as unknown as { authSubpathExports: number }).authSubpathExports)).toBe(4);
+    expect(errors).toEqual([]);
+    await page.close();
+  });
+
+  it("installs the CSS-only Astro consumer without any auth peer", async () => {
+    for (const peer of ["react-router", "@tanstack/react-query", "firebase"])
+      await expect(lstat(join(astro, "node_modules", peer))).rejects.toThrow();
   });
 
   it("builds and serves Astro with theme CSS, semantic tokens, local fonts and no React/client runtime", async () => {

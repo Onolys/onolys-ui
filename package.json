@@ -1,6 +1,6 @@
 {
   "name": "@onolys/common",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Shared design tokens, styles, and React components for Onolys.",
   "type": "module",
   "license": "MIT",
@@ -25,6 +25,18 @@
     "./tokens": {
       "types": "./dist/tokens/tokens.d.ts",
       "import": "./dist/tokens/tokens.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./auth/firebase": {
+      "types": "./dist/auth/firebase.d.ts",
+      "import": "./dist/auth/firebase.js"
+    },
+    "./auth/testing": {
+      "types": "./dist/auth/testing.d.ts",
+      "import": "./dist/auth/testing.js"
     },
     "./theme.css": "./dist/theme.css",
     "./tokens.css": "./dist/tokens.css",

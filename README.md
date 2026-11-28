@@ -39,6 +39,21 @@ separate from the JavaScript entry points. Built `dist/` files remain ignored du
 development; release tags will carry the built files. There is no install-time
 `prepare` build.
 
+## Entry points
+
+| Import | Contents | Needs |
+| --- | --- | --- |
+| `@onolys/common` | Components, helpers, constants | react, react-dom |
+| `@onolys/common/tokens` | Token values and contrast pairs | none |
+| `@onolys/common/auth` | `AuthProvider`, guards, sign-in pages | `react-router`, `@tanstack/react-query` |
+| `@onolys/common/auth/firebase` | `createFirebaseAuthService` | `firebase` |
+| `@onolys/common/auth/testing` | Auth emulator test helpers | `firebase` |
+| `@onolys/common/theme.css` (also `tokens.css`, `base.css`, `fonts.css`) | Styles | tailwindcss |
+| `@onolys/common/theme-init.js` | Pre-paint theme script | none |
+
+`react-router`, `@tanstack/react-query` and `firebase` are optional peers: install
+them only if you import the entry that uses them. A CSS-only consumer needs none.
+
 ## Tokens
 
 `src/tokens/tokens.ts` is the source of truth for both palettes, spacing,
