@@ -427,7 +427,7 @@ describe("immutable detached release tooling", () => {
     expect(smoke).toMatchObject({
       version: "0.1.0",
       noBuildScripts: true,
-      exports: 8,
+      exports: 7,
       button: "teal",
       dialog: true,
       cspViolations: 0,

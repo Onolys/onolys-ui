@@ -11,21 +11,6 @@ import { chromium, type Browser, type Page } from "playwright";
 import { tokens } from "../tokens/tokens";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const legacyNames = [
-  "color-background", "color-text", "color-accent", "color-on-accent",
-  "color-gray-50", "color-gray-100", "color-gray-300", "color-gray-600", "color-gray-900",
-  "color-score-good", "color-score-good-background", "color-score-fair",
-  "color-score-fair-background", "color-score-low", "color-score-low-background",
-  "hdr", "font-family-sans", "line-height-body", "line-height-heading",
-  ...["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"].map((size) => `font-size-${size}`),
-];
-
-it("preserves all legacy aliases and an independent migration gray", async () => {
-  const css = await readFile(resolve(root, "src/styles/legacy.css"), "utf8");
-  for (const name of legacyNames) expect(css).toMatch(new RegExp(`--${name}:\\s*var\\(--`));
-  expect(css).toContain("--legacy-gray-300: #c7d1d0;");
-});
-
 it("maps shared typography values without custom property self references", async () => {
   const css = await readFile(resolve(root, "src/styles/theme.css"), "utf8");
   for (const name of ["font-sans", "leading-body", "leading-heading", "text-xs", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl", "text-3xl", "text-4xl"] as const) {
@@ -54,7 +39,6 @@ describe("built Tailwind theme in Chromium", () => {
     await writeFile(join(fixture, "style.css"), `
       @import "${resolve(root, "node_modules/tailwindcss/index.css")}";
       @import "${resolve(root, "dist/theme.css")}";
-      @import "${resolve(root, "dist/legacy.css")}";
       @source inline("bg-primary bg-accent text-primary-foreground p-4 text-xl font-sans leading-body h-header px-gutter rounded-md shadow-sm");
       #motion { transition: opacity 2s; animation: fade 2s infinite; }
       @keyframes fade { to { opacity: .5; } }
@@ -98,7 +82,7 @@ describe("built Tailwind theme in Chromium", () => {
     if (fixture) await rm(fixture, { recursive: true, force: true });
   });
 
-  it("resolves semantic colors, typography, layout, and legacy values in light", async () => {
+  it("resolves semantic colors, typography, and layout in light", async () => {
     const styles = await page.locator("button").evaluate((button) => {
       const style = getComputedStyle(button);
       const root = getComputedStyle(document.documentElement);
@@ -106,14 +90,13 @@ describe("built Tailwind theme in Chromium", () => {
         background: style.backgroundColor, color: style.color, fontSize: style.fontSize,
         fontFamily: style.fontFamily, lineHeight: style.lineHeight, height: style.height,
         padding: style.paddingLeft, radius: style.borderRadius,
-        legacyGray: root.getPropertyValue("--color-gray-300").trim(),
         border: root.getPropertyValue("--border").trim(),
       };
     });
     expect(styles).toMatchObject({
       background: "rgb(11, 95, 90)", color: "rgb(255, 255, 255)", fontSize: "24px",
       lineHeight: "38.4px", height: "64px", padding: "16px", radius: "6px",
-      legacyGray: "#c7d1d0", border: "#6e7e7c",
+      border: "#6e7e7c",
     });
     expect(styles.fontFamily).toContain("Inter Variable");
     expect(await page.locator("#accent").evaluate((element) => getComputedStyle(element).backgroundColor))
@@ -154,13 +137,11 @@ describe("built Tailwind theme in Chromium", () => {
     expect(await page.locator("body").evaluate((body) => getComputedStyle(body).overflow)).not.toBe("hidden");
   });
 
-  it("switches semantic utilities and legacy aliases automatically under dark media", async () => {
+  it("switches semantic utilities automatically under dark media", async () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await expect.poll(() => page.locator("button").evaluate((button) => getComputedStyle(button).backgroundColor))
       .toBe("rgb(95, 196, 184)");
     expect(await page.locator("body").evaluate((body) => getComputedStyle(body).backgroundColor))
       .toBe("rgb(15, 21, 20)");
-    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--color-gray-300").trim()))
-      .toBe("#78928d");
   });
 });

@@ -30,8 +30,7 @@
     "./tokens.css": "./dist/tokens.css",
     "./base.css": "./dist/base.css",
     "./fonts.css": "./dist/fonts.css",
-    "./components.json": "./components.json",
-    "./legacy.css": "./dist/legacy.css"
+    "./components.json": "./components.json"
   },
   "files": [
     "dist",

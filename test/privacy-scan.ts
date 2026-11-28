@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
 import ts from "typescript";
 
 export interface PrivacyFinding {
@@ -39,6 +39,14 @@ const storage = new Set([
   "setPersistence",
   "persistentLocalCache",
 ]);
+/**
+ * The one named exception: the theme preference file may use localStorage
+ * (key `onolys-theme`). Paths are relative to the scanned source root (`src`).
+ * Every other storage API, and every other rule, still applies to it.
+ */
+const storageExceptions: Record<string, ReadonlySet<string>> = {
+  "lib/theme.ts": new Set(["localStorage"]),
+};
 const network = new Set([
   "fetch",
   "XMLHttpRequest",
@@ -101,7 +109,13 @@ export function privacyFindings(root: string): PrivacyFinding[] {
     function visit(node: ts.Node) {
       const position = node.getStart(source);
       if (ts.isIdentifier(node) || ts.isStringLiteralLike(node)) {
-        if (storage.has(node.text)) report("storage", node.text, position);
+        if (
+          storage.has(node.text) &&
+          !storageExceptions[relative(root, file).split(sep).join("/")]?.has(
+            node.text,
+          )
+        )
+          report("storage", node.text, position);
         if (network.has(node.text)) report("network", node.text, position);
         if (node.text === "dangerouslySetInnerHTML")
           report("raw-html", node.text, position);

@@ -77,11 +77,6 @@ a 3px keyboard focus outline, reduced motion, and CSS scroll locking via
 `body[data-scroll-locked]`. The font is covered by [its own SIL OFL license](fonts/OFL.txt).
 Set the consumer bundler's asset inline limit to zero to keep the font as a same-origin URL.
 
-Apps migrating older Onolys CSS may additionally import `@onolys/common/legacy.css`.
-Its `--color-*` and typography aliases keep existing selectors usable. The legacy
-light gray separator remains `#c7d1d0`; semantic `border` and `input` tokens use the
-stronger accessible boundary color. New utility classes use semantic names directly.
-
 ## Component conventions
 
 The scaffold uses Storybook 10.6 with Vite 8 and the accessibility addon.

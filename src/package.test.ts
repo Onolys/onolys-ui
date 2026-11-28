@@ -23,7 +23,6 @@ const exportsRequired = [
   "./tokens.css",
   "./base.css",
   "./fonts.css",
-  "./legacy.css",
   "./components.json",
 ];
 interface Manifest {
@@ -200,7 +199,6 @@ describe("packaged ESM and declaration contract", () => {
         "dist/tokens.css",
         "dist/base.css",
         "dist/fonts.css",
-        "dist/legacy.css",
         "fonts/inter-latin-wght-normal.woff2",
         "fonts/OFL.txt",
         "components.json",
@@ -232,7 +230,7 @@ describe("packaged ESM and declaration contract", () => {
           "utf8",
         ),
       );
-    for (const asset of ["theme", "legacy"]) {
+    for (const asset of ["theme"]) {
       const css = await readFile(join(installed, `dist/${asset}.css`), "utf8");
       expect(css).toContain('@import "./tokens.css";');
       for (const [, dependency] of css.matchAll(/@import ["'](\.[^"']+)["']/g))
