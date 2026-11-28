@@ -287,9 +287,7 @@ describe("verify email", () => {
     expect(within(screen.getByRole("main")).getByText(email!)).toBeInTheDocument();
   });
 
-  // Known bug the real service exposes (the old fake emitted differently): after sign-out the RequireUnverified guard's
-  // redirect to /login lands after VerifyEmail's navigate(/signup), so the user ends on /login. Flip to `it` when fixed.
-  it.fails("offers no Sign out; Use a different email clears the session and goes to /signup", async () => {
+  it("offers no Sign out; Use a different email clears the session and goes to /signup", async () => {
     const { service, router } = await renderAuthApp("/verify-email", { user: { verified: false } });
     await h1("Verify your email");
     expect(screen.queryByRole("button", { name: /sign out/i })).not.toBeInTheDocument();

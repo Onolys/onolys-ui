@@ -5,6 +5,21 @@ Versions follow Semantic Versioning; before 1.0, minor releases may break APIs.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-28
+
+### Fixed
+
+- Sign-out redirect race: `AuthProvider.signOut` now flips to signed out before callers navigate, so `useSignOut` lands on a plain `/login` (no `?next=`) and "Use a different email" ends on `/signup`.
+
+### Changed
+
+- Root `Field` takes an optional `id` (generated when omitted). The auth pages now reuse it instead of their own copy.
+
+### Added
+
+- `@onolys/common/auth/testing`: `signOutTestServices()` signs out every service `createTestAuthService` built; those services skip the redirect check jsdom cannot run (`consumeRedirectError` answers `undefined`).
+- CI pins `actions/setup-java` and `actions/cache` by commit SHA.
+
 ## [0.4.0] - 2026-11-28
 
 ### Added

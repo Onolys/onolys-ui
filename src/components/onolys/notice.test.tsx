@@ -19,4 +19,9 @@ describe("Notice, ErrorNote and Field", () => {
     render(<Field label="Name">{(id) => <input id={id} />}</Field>);
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
   });
+
+  it("Field uses the id it is given,", () => {
+    render(<Field label="Email" id="fixed-id">{(id) => <input id={id} />}</Field>);
+    expect(screen.getByLabelText("Email")).toHaveAttribute("id", "fixed-id");
+  });
 });

@@ -31,15 +31,27 @@ interface OobRecord {
   oobCode: string;
 }
 
+const made: AuthService[] = [];
+
 /**
  * The real Firebase service on the emulator. `emailApi` is `null` (no server routes in tests) unless given.
- * Every service built in one test file shares one Firebase app, so sign out between tests and use `newTestEmail()`.
+ * Its redirect check is skipped (`consumeRedirectError` answers `undefined`): jsdom cannot finish the SDK's own check.
+ * Every service built in one test file shares one Firebase app: call `signOutTestServices()` after each test
+ * and use `newTestEmail()`.
  */
 export function createTestAuthService(emailApi: EmailApi | null = null): AuthService {
-  return createFirebaseAuthService(
+  const service = createFirebaseAuthService(
     { apiKey: API_KEY, authDomain: `${TEST_PROJECT_ID}.firebaseapp.com`, projectId: TEST_PROJECT_ID, appId: "1:1:web:1" },
     { emailApi, emulatorUrl: EMULATOR_URL },
   );
+  service.consumeRedirectError = async () => undefined;
+  made.push(service);
+  return service;
+}
+
+/** Signs out every service `createTestAuthService` built since the last call (put it in `afterEach`). */
+export async function signOutTestServices(): Promise<void> {
+  await Promise.all(made.splice(0).map((service) => service.signOut()));
 }
 
 let counter = 0;

@@ -15,7 +15,7 @@ import {
   useAuth,
   type AuthService,
 } from "../src/auth";
-import { createTestAuthService, signUpTestUser } from "../src/auth/testing";
+import { createTestAuthService, signOutTestServices, signUpTestUser } from "../src/auth/testing";
 import type { EmailApi } from "../src/auth/firebase";
 
 /**
@@ -101,31 +101,18 @@ export interface RenderOptions {
   onSignOut?: () => void;
 }
 
-const made: AuthService[] = [];
 // Every service in a test file shares one Firebase app: leave nobody signed in for the next test.
 afterEach(async () => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  await Promise.all(made.splice(0).map((s) => s.signOut()));
+  await signOutTestServices();
 });
 
 /** A new emulator-backed service, signed out again after the test. */
-export function testService(emailApi: EmailApi | null = null): AuthService {
-  const service = createTestAuthService(emailApi);
-  made.push(service);
-  noRedirectCheck(service);
-  return service;
-}
-
-// jsdom cannot finish the SDK's redirect check (it answers auth/operation-not-supported-in-this-environment).
-function noRedirectCheck(service: AuthService) {
-  if (!vi.isMockFunction(service.consumeRedirectError)) vi.spyOn(service, "consumeRedirectError").mockResolvedValue(undefined);
-}
+export const testService = createTestAuthService;
 
 export async function renderAuthApp(path: string, opts: RenderOptions = {}) {
   const service = opts.service ?? testService(opts.emailApi ?? null);
-  if (!made.includes(service)) made.push(service);
-  noRedirectCheck(service);
   const creds = opts.user ? await signUpTestUser(service, opts.user) : undefined;
   const queryClient = new QueryClient();
   const router = createMemoryRouter(opts.routes ?? authRoutes(opts.allowedHosts), { initialEntries: [path] });
