@@ -2,7 +2,7 @@ import { useEffect, useRef, type ComponentProps, type ReactNode } from "react";
 import { Link } from "react-router";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Field as OnolysField } from "../../components/onolys/field";
 import type { MappedAuthError } from "../errors";
 import { AUTH_PATHS, LINK } from "../../constants";
 import { withNext } from "../next";
@@ -51,14 +51,7 @@ export function StatusNote({ children }: { children: ReactNode }) {
   );
 }
 
-/** Label + Input pair; `id` links them so the accessible name stays the label text. */
+/** Label + Input pair on the shared Field; `id` links them so the accessible name stays the label text. */
 export function Field({ label, id, ...input }: { label: string; id: string } & ComponentProps<typeof Input>) {
-  return (
-    <div className="grid gap-1">
-      <Label htmlFor={id} className="min-h-0 text-base font-semibold">
-        {label}
-      </Label>
-      <Input id={id} {...input} />
-    </div>
-  );
+  return <OnolysField label={label} id={id}>{(fieldId) => <Input id={fieldId} {...input} />}</OnolysField>;
 }
