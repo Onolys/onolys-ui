@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
+import { HEADER_CENTER_NAV } from "../../constants";
 import { cn } from "../../lib/cn";
 
 export type AppHeaderProps = Omit<ComponentProps<"header">, "children"> & {
@@ -6,16 +7,18 @@ export type AppHeaderProps = Omit<ComponentProps<"header">, "children"> & {
   navigation?: ReactNode;
   navigationLabel?: string;
   accountMenu?: ReactNode;
+  /** Place the navigation at the true centre of the bar (brand left, account menu right). */
+  centerNavigation?: boolean;
 };
 
 /** Applications supply their own router links and decide when account controls appear. */
 export function AppHeader({
-  brand, navigation, navigationLabel = "Main", accountMenu, className, ...props
+  brand, navigation, navigationLabel = "Main", accountMenu, centerNavigation = false, className, ...props
 }: AppHeaderProps) {
   return (
     <header
       data-slot="app-header"
-      className={cn("flex min-h-header flex-wrap items-center gap-x-6 gap-y-2 border-b border-border bg-background px-gutter py-2 text-foreground", className)}
+      className={cn(centerNavigation && HEADER_CENTER_NAV, "flex min-h-header flex-wrap items-center gap-x-6 gap-y-2 border-b border-border bg-background px-gutter py-2 text-foreground", className)}
       {...props}
     >
       <div data-slot="app-header-brand" className="mr-auto flex items-center font-semibold [&_a]:inline-flex [&_a]:min-h-11 [&_a]:min-w-11 [&_a]:items-center">

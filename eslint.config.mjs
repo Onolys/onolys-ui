@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 
 export default tseslint.config(
-  { ignores: ["dist/**", "storybook-static/**", "node_modules/**"] },
+  { ignores: ["scripts/theme-init.template.js", "dist/**", "storybook-static/**", "node_modules/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

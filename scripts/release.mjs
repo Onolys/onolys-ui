@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 
-const repository = "Onolys/onolys-ui";
+const repository = "Onolys/onolys-common";
 const sha = /^[a-f0-9]{40}$/;
 const versionPattern = "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)";
 function git(cwd, args, env = process.env) {
@@ -83,7 +83,7 @@ async function validate(cwd, trigger, source) {
     await readFile(join(cwd, "package-lock.json"), "utf8"),
   );
   if (
-    manifest.name !== "@onolys/ui" ||
+    manifest.name !== "@onolys/common" ||
     manifest.version !== info.version ||
     lock.version !== info.version ||
     lock.packages?.[""]?.version !== info.version
@@ -151,7 +151,7 @@ async function build(cwd, values) {
   git(cwd, ["add", "--force", "dist"]);
   git(cwd, [
     "-c",
-    "user.name=onolys-ui release",
+    "user.name=onolys-common release",
     "-c",
     "user.email=41898282+github-actions[bot]@users.noreply.github.com",
     "commit",

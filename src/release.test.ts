@@ -209,7 +209,7 @@ describe("immutable detached release tooling", () => {
     expect(publisher).toContain("actions/checkout@");
     expect(publisher).toContain("ref: ${{ github.sha }}");
     expect(publisher).toContain("persist-credentials: false");
-    expect(publisher).toContain("path: ${{ runner.temp }}/onolys-ui-release");
+    expect(publisher).toContain("path: ${{ runner.temp }}/onolys-common-release");
     expect(publisher).toContain("RELEASE_SOURCE: ${{ github.sha }}");
     expect(publisher).toContain("RELEASE_TRIGGER: ${{ github.ref_name }}");
     expect(publisher).toContain(
@@ -220,9 +220,9 @@ describe("immutable detached release tooling", () => {
     );
     expect(publisher).not.toContain("node release/release.mjs");
     expect(publisher).not.toMatch(/npm (?:ci|install)/);
-    expect(workflow).toContain("/onolys-ui-release/release.bundle");
-    expect(workflow).toContain("/onolys-ui-release/release.json");
-    expect(workflow).toContain("/onolys-ui-release/release-notes.md");
+    expect(workflow).toContain("/onolys-common-release/release.bundle");
+    expect(workflow).toContain("/onolys-common-release/release.json");
+    expect(workflow).toContain("/onolys-common-release/release-notes.md");
   });
 
   it.each(["source", "trigger"] as const)(
@@ -231,7 +231,7 @@ describe("immutable detached release tooling", () => {
       const directory = join(fixture, `mismatch-${field}`);
       await mkdir(directory);
       const metadata = {
-        repository: "Onolys/onolys-ui",
+        repository: "Onolys/onolys-common",
         version: "0.1.0",
         tag: "v0.1.0",
         source: sourceSha,
@@ -251,7 +251,7 @@ describe("immutable detached release tooling", () => {
           "--directory",
           directory,
           "--repository",
-          "Onolys/onolys-ui",
+          "Onolys/onolys-common",
           "--source",
           sourceSha,
           "--trigger",
@@ -354,7 +354,7 @@ describe("immutable detached release tooling", () => {
           "--directory",
           output,
           "--repository",
-          "Onolys/onolys-ui",
+          "Onolys/onolys-common",
           "--source",
           sourceSha,
           "--trigger",
@@ -427,7 +427,7 @@ describe("immutable detached release tooling", () => {
     expect(smoke).toMatchObject({
       version: "0.1.0",
       noBuildScripts: true,
-      exports: 8,
+      exports: 11,
       button: "teal",
       dialog: true,
       cspViolations: 0,

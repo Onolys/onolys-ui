@@ -12,7 +12,7 @@ const spec = values.spec ?? "";
 const stable = "v(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)";
 if (
   !new RegExp(
-    `^(?:github:Onolys/onolys-ui|git\\+https://github\\.com/Onolys/onolys-ui\\.git)#${stable}$`,
+    `^(?:github:Onolys/onolys-common|git\\+https://github\\.com/Onolys/onolys-common\\.git)#${stable}$`,
   ).test(spec) &&
   !new RegExp(`^git\\+file:///.+#${stable}$`).test(spec)
 )
@@ -79,7 +79,7 @@ try {
       private: true,
       type: "module",
       dependencies: {
-        "@onolys/ui": spec,
+        "@onolys/common": spec,
         react: toolchain.react,
         "react-dom": toolchain["react-dom"],
       },
@@ -95,16 +95,16 @@ try {
     join(fixture, "probe.mjs"),
     `
     import assert from 'node:assert/strict'; import { readFile, access } from 'node:fs/promises'; import { dirname, resolve } from 'node:path'; import { fileURLToPath } from 'node:url';
-    const root = resolve(dirname(fileURLToPath(import.meta.resolve('@onolys/ui'))), '..');
+    const root = resolve(dirname(fileURLToPath(import.meta.resolve('@onolys/common'))), '..');
     const manifest = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
     assert.equal(manifest.version, ${JSON.stringify(expectedVersion)}); assert.equal(manifest.scripts, undefined); assert.equal(manifest.devDependencies, undefined);
     for (const [key, value] of Object.entries(manifest.exports)) {
-      const target = fileURLToPath(import.meta.resolve(key === '.' ? '@onolys/ui' : '@onolys/ui/' + key.slice(2)));
+      const target = fileURLToPath(import.meta.resolve(key === '.' ? '@onolys/common' : '@onolys/common/' + key.slice(2)));
       assert.ok((await readFile(target)).length);
       if (typeof value === 'object') assert.ok((await readFile(resolve(root, value.types))).length);
     }
     for (const tool of ['tsup', '@storybook']) await assert.rejects(access(resolve('node_modules', tool)));
-    const ui = await import('@onolys/ui'); const tokens = await import('@onolys/ui/tokens'); assert.equal(typeof ui.Button, 'function'); assert.equal(tokens.tokens.light.primary, '#0b5f5a');
+    const ui = await import('@onolys/common'); const tokens = await import('@onolys/common/tokens'); assert.equal(typeof ui.Button, 'function'); assert.equal(tokens.tokens.light.primary, '#0b5f5a');
     const css = await readFile(resolve(root, 'dist/fonts.css'), 'utf8'); const font = css.match(/url\\(['"]?([^)'"]+)/)[1];
     assert.equal((await readFile(resolve(root, 'dist', font))).subarray(0,4).toString(), 'wOF2');
     process.stdout.write(JSON.stringify({ version: manifest.version, exports: Object.keys(manifest.exports).length, noBuildScripts: true }));
@@ -117,11 +117,11 @@ try {
   );
   await writeFile(
     join(fixture, "main.jsx"),
-    `import React from 'react'; import { createRoot } from 'react-dom/client'; import { Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from '@onolys/ui'; import './style.css'; createRoot(document.getElementById('root')).render(<><Button id="brand">Brand</Button><Dialog><DialogTrigger asChild><Button>Open dialog</Button></DialogTrigger><DialogContent><DialogTitle>Release dialog</DialogTitle><DialogDescription>Git-installed component.</DialogDescription><Button>Continue</Button></DialogContent></Dialog></>);`,
+    `import React from 'react'; import { createRoot } from 'react-dom/client'; import { Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from '@onolys/common'; import './style.css'; createRoot(document.getElementById('root')).render(<><Button id="brand">Brand</Button><Dialog><DialogTrigger asChild><Button>Open dialog</Button></DialogTrigger><DialogContent><DialogTitle>Release dialog</DialogTitle><DialogDescription>Git-installed component.</DialogDescription><Button>Continue</Button></DialogContent></Dialog></>);`,
   );
   await writeFile(
     join(fixture, "style.css"),
-    '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n@source "./node_modules/@onolys/ui/dist";\n',
+    '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n@source "./node_modules/@onolys/common/dist";\n',
   );
   await writeFile(
     join(fixture, "vite.config.mjs"),

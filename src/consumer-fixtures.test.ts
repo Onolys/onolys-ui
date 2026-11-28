@@ -26,6 +26,9 @@ const versions = {
   astro: "7.4.13",
   react: "19.3.1",
   "react-dom": "19.3.1",
+  "react-router": "8.5.2",
+  "@tanstack/react-query": "5.108.1",
+  firebase: "13.4.0",
 };
 const policy =
   "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'";
@@ -182,9 +185,12 @@ describe("independent packed-tarball consumers", () => {
         private: true,
         type: "module",
         dependencies: {
-          "@onolys/ui": dependency,
+          "@onolys/common": dependency,
           react: versions.react,
           "react-dom": versions["react-dom"],
+          "react-router": versions["react-router"],
+          "@tanstack/react-query": versions["@tanstack/react-query"],
+          firebase: versions.firebase,
         },
         devDependencies: {
           vite: versions.vite,
@@ -199,7 +205,7 @@ describe("independent packed-tarball consumers", () => {
         name: "astro-css-consumer",
         private: true,
         type: "module",
-        dependencies: { "@onolys/ui": dependency },
+        dependencies: { "@onolys/common": dependency },
         devDependencies: {
           astro: versions.astro,
           vite: versions.vite,
@@ -239,8 +245,12 @@ describe("independent packed-tarball consumers", () => {
       join(vite, "src/main.jsx"),
       `
       import React from 'react'; import { createRoot } from 'react-dom/client';
-      import { Page, Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Select } from '@onolys/ui';
+      import { Page, Button, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Select } from '@onolys/common';
+      import { AuthProvider, Login, mapAuthError } from '@onolys/common/auth';
+      import { createFirebaseAuthService } from '@onolys/common/auth/firebase';
       import './style.css';
+      const authSubpaths = new URLSearchParams(location.search).has('auth-probe') ? [AuthProvider, Login, mapAuthError, createFirebaseAuthService] : [];
+      window.authSubpathExports = authSubpaths.length;
       function App() {
         const [result, setResult] = React.useState('Ready'); const [language, setLanguage] = React.useState('en');
         return <Page><h1>Packed consumer</h1><Button id="brand">Brand button</Button>
@@ -255,8 +265,8 @@ describe("independent packed-tarball consumers", () => {
       createRoot(document.getElementById('root')).render(<App />);
     `,
     );
-    const css = '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n';
-    const scannedCss = css + '@source "../node_modules/@onolys/ui/dist";\n';
+    const css = '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n';
+    const scannedCss = css + '@source "../node_modules/@onolys/common/dist";\n';
     await writeFile(join(vite, "src/style.css"), scannedCss);
     run(
       process.execPath,
@@ -286,7 +296,7 @@ describe("independent packed-tarball consumers", () => {
     );
     await writeFile(
       join(astro, "src/theme.css"),
-      '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n',
+      '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n',
     );
     await writeFile(
       join(astro, "src/pages/index.astro"),
@@ -325,7 +335,7 @@ describe("independent packed-tarball consumers", () => {
     for (const directory of [vite, astro])
       expect(
         (
-          await lstat(join(directory, "node_modules/@onolys/ui"))
+          await lstat(join(directory, "node_modules/@onolys/common"))
         ).isSymbolicLink(),
       ).toBe(false);
     for (const [directory, names] of [
@@ -501,6 +511,26 @@ describe("independent packed-tarball consumers", () => {
     }
   });
 
+  it("bundles the root, /auth and /auth/firebase subpaths in the Vite consumer", async () => {
+    const bundle = (await files(viteOutput))
+      .filter((file) => file.endsWith(".js"))
+      .map((file) => readFile(file, "utf8"));
+    const code = (await Promise.all(bundle)).join("\n");
+    expect(code).toContain("auth/wrong-password");
+    const page = await browser.newPage({ colorScheme: "light" });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(`${viteOrigin}?auth-probe`);
+    expect(await page.evaluate(() => (window as unknown as { authSubpathExports: number }).authSubpathExports)).toBe(4);
+    expect(errors).toEqual([]);
+    await page.close();
+  });
+
+  it("installs the CSS-only Astro consumer without any auth peer", async () => {
+    for (const peer of ["react-router", "@tanstack/react-query", "firebase"])
+      await expect(lstat(join(astro, "node_modules", peer))).rejects.toThrow();
+  });
+
   it("builds and serves Astro with theme CSS, semantic tokens, local fonts and no React/client runtime", async () => {
     const output = await files(astroOutput);
     expect(output.some((file) => /\.[cm]?js$/.test(file))).toBe(false);
@@ -508,7 +538,7 @@ describe("independent packed-tarball consumers", () => {
     expect(html).not.toContain("<script");
     expect(html).toContain('rel="stylesheet"');
     expect(await readFile(join(astro, "src/theme.css"), "utf8")).toBe(
-      '@import "tailwindcss";\n@import "@onolys/ui/theme.css";\n',
+      '@import "tailwindcss";\n@import "@onolys/common/theme.css";\n',
     );
     const page = await browser.newPage({ colorScheme: "light" });
     const fonts = await observe(page);

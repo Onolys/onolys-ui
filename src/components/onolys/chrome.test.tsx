@@ -136,3 +136,32 @@ describe("SkipLink", () => {
     expect(link).toHaveFocus();
   });
 });
+
+describe("AppHeader centerNavigation", () => {
+  it("centres the navigation only when asked", () => {
+    const { rerender } = render(<AppHeader brand="Example" navigation={<a href="/a">A</a>} />);
+    expect(screen.getByRole("banner").className).not.toMatch(/left-1\/2/);
+    rerender(<AppHeader brand="Example" navigation={<a href="/a">A</a>} centerNavigation />);
+    expect(screen.getByRole("banner").className).toMatch(/\[&>nav\]:left-1\/2/);
+  });
+});
+
+describe("Footer compact and themeToggle", () => {
+  it("compact applies the one-row layout; default does not", () => {
+    const { rerender } = render(<Footer copyright="c" />);
+    expect(screen.getByRole("contentinfo").className).not.toMatch(/text-xs/);
+    rerender(<Footer copyright="c" compact />);
+    expect(screen.getByRole("contentinfo").className).toMatch(/text-xs/);
+    expect(screen.getByRole("contentinfo").className).toMatch(/\brelative\b/);
+  });
+
+  it("renders the themeToggle slot", () => {
+    render(<Footer compact themeToggle={<button type="button">Theme</button>} />);
+    expect(within(screen.getByRole("contentinfo")).getByRole("button", { name: "Theme" })).toBeVisible();
+  });
+
+  it("omits the slot wrapper when no toggle is given", () => {
+    render(<Footer />);
+    expect(screen.getByRole("contentinfo").querySelector("[data-slot=footer-theme-toggle]")).toBeNull();
+  });
+});

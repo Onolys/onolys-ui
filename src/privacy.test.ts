@@ -115,4 +115,55 @@ describe("privacy guard negative controls", () => {
       await rm(fixture, { recursive: true, force: true });
     }
   });
+
+  it("skips only the emulator test helper auth/testing.ts, not other files in auth/", async () => {
+    const fixture = await mkdtemp(join(tmpdir(), "onolys-privacy-"));
+    try {
+      await mkdir(join(fixture, "auth"));
+      await writeFile(join(fixture, "auth/testing.ts"), 'fetch("http://127.0.0.1:9099");');
+      expect(privacyFindings(fixture)).toEqual([]);
+      await writeFile(join(fixture, "auth/other.ts"), 'fetch("http://127.0.0.1:9099");');
+      expect(privacyFindings(fixture)).toContainEqual(expect.objectContaining({ file: "auth/other.ts", rule: "network" }));
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
+  it("allows localStorage only in the named theme storage file", async () => {
+    const fixture = await mkdtemp(join(tmpdir(), "onolys-privacy-"));
+    try {
+      await mkdir(join(fixture, "lib"));
+      await writeFile(
+        join(fixture, "lib/theme.ts"),
+        'export const read = () => localStorage.getItem("onolys-theme");',
+      );
+      await writeFile(
+        join(fixture, "lib/other.ts"),
+        'export const read = () => localStorage.getItem("onolys-theme");',
+      );
+      expect(privacyFindings(fixture)).toEqual([
+        expect.objectContaining({ file: "lib/other.ts", rule: "storage" }),
+      ]);
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
+  it("keeps every other rule active inside the theme storage file", async () => {
+    const fixture = await mkdtemp(join(tmpdir(), "onolys-privacy-"));
+    try {
+      await mkdir(join(fixture, "lib"));
+      await writeFile(
+        join(fixture, "lib/theme.ts"),
+        "sessionStorage.clear(); fetch('/x'); console.log('x');",
+      );
+      expect(privacyFindings(fixture).map((f) => f.rule).sort()).toEqual([
+        "console",
+        "network",
+        "storage",
+      ]);
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
 });

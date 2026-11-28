@@ -5,6 +5,27 @@ Versions follow Semantic Versioning; before 1.0, minor releases may break APIs.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-28
+
+### Added
+
+- Package renamed to `@onolys/common` (was `@onolys/ui`); update installs and imports.
+- Root components and helpers: `Field`, `Notice`, `ErrorNote`, `StatusChip`, `SlowStartNotice` (`useSlowPending`), `ErrorRecovery`, `AccountMenu`, `ThemeToggle`, theme helpers (`applyTheme`, `readTheme`, `saveTheme`, `nextTheme`), format helpers (`formatDate`, `formatElapsed`, `formatResetTime`) and shared class constants. `AppHeader` gains `centerNavigation`; `Footer` gains `compact` and `themeToggle`.
+- `@onolys/common/auth`: provider-neutral sign-in (`AuthProvider`, route guards, `Login`, `Signup`, `VerifyEmail`, `ForgotPassword`, `AuthAction`, error mapping, next-URL helpers). Needs `react-router` and `@tanstack/react-query`.
+- `@onolys/common/auth/firebase`: `createFirebaseAuthService` and `EmailApi`, the Firebase implementation of the auth service. Needs `firebase`.
+- `@onolys/common/auth/testing`: helpers that drive the real Firebase service against the Auth emulator in tests.
+- `@onolys/common/theme-init.js` pre-paint theme script export.
+- `react-router`, `@tanstack/react-query` and `firebase` are optional peer dependencies; the root entry and the CSS exports load none of them. Entries share chunks, so a component ships once.
+- Storybook families for the new components.
+
+### Changed
+
+- Privacy guard exceptions: `src/lib/theme.ts` may use `localStorage` for the theme preference; `src/auth/testing.ts` may call `fetch` against the emulator URL. No other file may.
+
+### Removed
+
+- Breaking: `legacy.css` is removed. Use `theme.css` with the semantic tokens.
+
 ## [0.3.0] - 2026-11-24
 
 ### Added

@@ -44,7 +44,7 @@ const light = {
   "destructive-foreground": "#ffffff",
   success: "#166534",
   warning: "#854d0e",
-  // Stronger than legacy gray-300: these boundaries convey control affordances.
+  // Accessible boundary color: these boundaries convey control affordances.
   border: "#6e7e7c",
   input: "#6e7e7c",
   ring: "#0b5f5a",
