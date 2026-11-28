@@ -30,6 +30,7 @@
     "./tokens.css": "./dist/tokens.css",
     "./base.css": "./dist/base.css",
     "./fonts.css": "./dist/fonts.css",
+    "./theme-init.js": "./dist/theme-init.js",
     "./components.json": "./components.json"
   },
   "files": [

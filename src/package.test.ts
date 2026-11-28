@@ -23,6 +23,7 @@ const exportsRequired = [
   "./tokens.css",
   "./base.css",
   "./fonts.css",
+  "./theme-init.js",
   "./components.json",
 ];
 interface Manifest {
@@ -199,6 +200,7 @@ describe("packaged ESM and declaration contract", () => {
         "dist/tokens.css",
         "dist/base.css",
         "dist/fonts.css",
+        "dist/theme-init.js",
         "fonts/inter-latin-wght-normal.woff2",
         "fonts/OFL.txt",
         "components.json",
