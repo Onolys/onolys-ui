@@ -103,6 +103,7 @@ export { applyTheme, nextTheme, readTheme, saveTheme, type Theme as ThemePrefere
 export { formatDate, formatElapsed, formatResetTime } from "./lib/format";
 export {
   ACTIONS,
+  AUTH_PATHS,
   H1,
   HEADER_CENTER_NAV,
   LINK,

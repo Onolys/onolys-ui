@@ -6,6 +6,15 @@ export const THEME_STORAGE_KEY = "onolys-theme";
 /** How long a request stays pending before the "server is waking up" note appears. */
 export const SLOW_START_MS = 2000;
 
+/** Fixed sign-in routes served by `@onolys/common/auth`. Apps mount the pages at exactly these paths. */
+export const AUTH_PATHS = {
+  login: "/login",
+  signup: "/signup",
+  forgotPassword: "/forgot-password",
+  verifyEmail: "/verify-email",
+  action: "/auth/action",
+} as const;
+
 /** Layout/text class constants shared by screens (semantic tokens only). */
 export const H1 = "m-0 text-2xl font-semibold";
 /** Page stack: heading, notices, forms. */
